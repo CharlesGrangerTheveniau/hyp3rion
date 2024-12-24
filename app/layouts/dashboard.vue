@@ -1,0 +1,83 @@
+<template>
+    <div class="relative flex flex-row">
+      <!-- Mobile slideover -->
+
+        <USlideover side="left" :ui="{
+            content: 'divide-none',
+        }">
+            <div class="lg:hidden w-full fixed top-0 left-0 z-40 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 p-4 shadow-sm flex flex-row justify-between items-center">
+                <div>🔥</div>
+                <UButton icon="i-heroicons-bars-3" color="gray" variant="ghost" />
+            </div>
+            <template #body>
+                <div class="flex flex-col justify-between h-full bg-white dark:bg-gray-900">
+                    <Sidebar type="mobile" :nav-fixed="isNavFixed"/>
+                </div>
+            </template>
+        </USlideover>
+  
+      <!-- Desktop navigation -->
+      <Transition
+        enter-active-class="transition ease-in-out duration-300 transform"
+        enter-from-class="-translate-x-full"
+        enter-to-class="translate-x-0"
+        leave-active-class="transition ease-in-out duration-300 transform"
+        leave-from-class="translate-x-0"
+        leave-to-class="-translate-x-full"
+      >
+        <div 
+            v-show="isDesktopMenuOpen || isNavFixed" 
+            class="fixed hidden lg:flex flex-col justify-between h-screen w-[25%] bg-white dark:bg-gray-900 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)] p-8 z-50 transition-all duration-300"
+            @mouseleave="handleMouseLeave">
+            
+            <Sidebar type="desktop" :nav-fixed="isNavFixed"/>
+        </div>
+      </Transition>
+  
+      <!-- Hover trigger area -->
+      <div 
+        v-if="!isNavFixed" 
+        class="hidden lg:block fixed left-0 h-screen w-8 z-40"
+        @mouseenter="isDesktopMenuOpen = true"/>
+  
+      <!-- Main content -->
+      <main 
+        class="min-h-screen transition-all duration-300" 
+        :class="[
+            'mt-[60px] p-4 lg:mt-0 lg:p-8',
+            (isDesktopMenuOpen || isNavFixed) ? 'lg:ml-[25%]' : 'lg:ml-8'
+        ]">
+        <slot />
+      </main>
+    </div>
+  </template>
+  
+  <script lang="ts" setup>
+  import Sidebar from '~/components/Sidebar.vue'
+  const user = useSupabaseUser()
+  
+  // Menu state
+  const isDesktopMenuOpen = ref(false)
+  const isNavFixed = ref(true)
+
+  
+  // Auto-close desktop menu when mouse leaves
+  const handleMouseLeave = () => {
+    if (!isNavFixed.value) {
+      isDesktopMenuOpen.value = false
+    }
+  }
+  
+  // Watch for user authentication
+  watch(user, () => {
+    if(!user.value){
+      navigateTo('/login')
+    }
+  })
+  
+  
+  
+  </script>
+  
+  <style scoped>
+  </style>
