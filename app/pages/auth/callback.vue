@@ -7,10 +7,11 @@ const router = useRouter()
 onMounted(async () => {
   if (user.value) {
     // Now we can fetch the user profile
-    const userProfile = await $fetch('/api/users/getUser', {
+    const userProfile = await $fetch('/api/users', {
       headers: {
         'X-User-Data': JSON.stringify(user.value)
-      }
+      },
+      method: 'GET'
     })
     
     // Redirect to dashboard or wherever needed

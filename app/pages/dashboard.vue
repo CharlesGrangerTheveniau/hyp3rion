@@ -1,8 +1,11 @@
+<!-- eslint-disable vue/no-multiple-template-root -->
 <template>
     <h1>Dashboard</h1>
+    
 </template>
 
 <script lang="ts" setup>
+
 
 definePageMeta({
   layout: 'dashboard'
@@ -11,26 +14,13 @@ definePageMeta({
 const user = useSupabaseUser()
 console.log(user.value)
 
-const loadEntities = async () => {
-    
-    const entities = await $fetch('/api/entities/getEntities', {
-        headers: {
-            'X-User-Data': user.value?.id || ''
-        }
-    })
-    console.log(entities)
-    return entities
+
+if (!user.value?.id) {
+  navigateTo('/login')
 }
 
-const loadDocuments = async () => {
-    const documents = await $fetch('/api/documents/getDocuments', {
-        headers: {
-            'X-User-Data': user.value?.id || ''
-        }
-    })
-    console.log(documents)
-    return documents
-}
+
+
 
 </script>
 

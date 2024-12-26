@@ -1,5 +1,6 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <template>
-    <div class="relative flex flex-row">
+    <div class="relative flex flex-row w-full">
       <!-- Mobile slideover -->
 
         <USlideover side="left" :ui="{
@@ -28,9 +29,12 @@
         <div 
             v-show="isDesktopMenuOpen || isNavFixed" 
             class="fixed hidden lg:flex flex-col justify-between h-screen w-[25%] bg-white dark:bg-gray-900 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)] p-8 z-50 transition-all duration-300"
-            @mouseleave="handleMouseLeave">
+            @mouseleave="isNavFixed ? null : isDesktopMenuOpen = false">
             
-            <Sidebar type="desktop" :nav-fixed="isNavFixed"/>
+            <Sidebar 
+              type="desktop" 
+              :nav-fixed="isNavFixed"
+              @update:nav-fixed="isNavFixed = $event"/>
         </div>
       </Transition>
   
@@ -42,10 +46,10 @@
   
       <!-- Main content -->
       <main 
-        class="min-h-screen transition-all duration-300" 
+        class="min-h-screen w-[100%] transition-all duration-300" 
         :class="[
             'mt-[60px] p-4 lg:mt-0 lg:p-8',
-            (isDesktopMenuOpen || isNavFixed) ? 'lg:ml-[25%]' : 'lg:ml-8'
+            (isDesktopMenuOpen || isNavFixed.value) ? 'lg:ml-[25%]' : 'lg:ml-8'
         ]">
         <slot />
       </main>
@@ -57,11 +61,12 @@
   const user = useSupabaseUser()
   
   // Menu state
-  const isDesktopMenuOpen = ref(false)
+  const isDesktopMenuOpen = ref(true)
   const isNavFixed = ref(true)
 
   
   // Auto-close desktop menu when mouse leaves
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleMouseLeave = () => {
     if (!isNavFixed.value) {
       isDesktopMenuOpen.value = false
@@ -75,7 +80,14 @@
     }
   })
   
-  
+
+    defineShortcuts({
+        meta_o: () => {
+            console.log('open')
+            isNavFixed.value = !isNavFixed.value
+            isDesktopMenuOpen.value = !isDesktopMenuOpen.value
+        }
+    })
   
   </script>
   

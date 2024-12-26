@@ -8,17 +8,12 @@
         <div class="flex items-center gap-4">
           <div class="nav-item">
             <span>Features</span>
-            <UBadge class="ml-2"label="New" />
+            <UBadge class="ml-2" label="New" />
           </div>
           <div class="nav-item">
             <span>Pricing</span>
           </div>
-          <div class="nav-item">
-            <span>Updates</span>
-          </div>
-          <div class="nav-item">
-            <span>App</span>
-          </div>
+          
         </div>
       </div>
 

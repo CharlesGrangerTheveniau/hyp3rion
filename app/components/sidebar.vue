@@ -1,23 +1,22 @@
 <template>
     <div>
-        <div class="flex justify-between mb-4">
-            <UButton 
-                v-if="type === 'desktop'"
-                :icon="isNavFixed ? 'i-heroicons-lock-closed' : 'i-heroicons-lock-open'" 
-                color="gray" 
-                variant="ghost" 
-                :title="isNavFixed ? 'Unpin navigation' : 'Pin navigation'"
-                @click="isNavFixed = !isNavFixed"
-            />
+        <div v-if="type === 'desktop'" class="flex justify-between mb-4">
+            
+                <UButton
+                    :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'" 
+                    
+                    variant="ghost" 
+                    title="Toggle theme"
+                    @click="isDark = !isDark"
+                />
 
-            <UButton
-                v-if="type === 'desktop'"
-                :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'" 
-                color="gray" 
-                variant="ghost" 
-                title="Toggle theme"
-                @click="isDark = !isDark"
-            />
+                <UButton 
+                    :icon="isNavFixed ? 'i-heroicons-lock-closed' : 'i-heroicons-lock-open'" 
+                    variant="ghost" 
+                    :title="isNavFixed ? 'Unpin navigation' : 'Pin navigation'"
+                    @click="$emit('update:navFixed', !isNavFixed)"
+                />
+            
         </div>
         <UNavigationMenu 
             orientation="vertical"
@@ -36,6 +35,10 @@
         navFixed?: boolean
     }>()
 
+    const emit = defineEmits<{
+        'update:navFixed': [value: boolean]
+    }>()
+
     const colorMode = useColorMode()
     const isDark = computed({
         get: () => colorMode.value === 'dark',
@@ -45,7 +48,10 @@
     const user = useSupabaseUser()
     const client = useSupabaseClient()
 
-    const isNavFixed = ref(props.navFixed)
+    const isNavFixed = computed({
+        get: () => props.navFixed ?? false,
+        set: (value) => emit('update:navFixed', value)
+    })
   
     const topLinks = [
         [
@@ -58,7 +64,7 @@
         [
             {
                 label: 'Documents',
-                icon: 'i-heroicons-home',
+                icon: 'i-heroicons-document-text',
                 to: '/getting-started/installation'
             }, 
             { 
@@ -87,7 +93,8 @@
             avatar: {
                 src: user.value?.user_metadata.avatar_url
             },
-            badge: 100
+            badge: 100,
+            to: '/profile'
         },
         {
             label: 'Sign out',
@@ -103,7 +110,10 @@
         bottomLinks.value.push({
             label: isDark.value ? 'Dark Theme' : 'Light Theme',
             icon: isDark.value ? 'i-heroicons-moon' : 'i-heroicons-sun',
-            onSelect: () => isDark.value = !isDark.value
+            onSelect: async () => {
+                isDark.value = !isDark.value
+                return Promise.resolve()
+            }
         })
     }
 </script>

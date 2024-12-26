@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -21,14 +21,26 @@ enum DocumentStatus {
   REJECTED
 }
 
+model Address {
+  id        String     @id @default(uuid())
+  line1     String
+  line2     String?
+  city      String
+  zip       String
+  country   String
+  entity    Entity?
+}
+
 model User {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   firstName String?
   lastName  String?
   fullName  String?
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  phone     String?
+  avatarUrl String?
+  email     String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   entities  Entity[]
   documents Document[]
 }
@@ -40,6 +52,8 @@ model Entity {
   user          User       @relation(fields: [userId], references: [id])
   userId        String
   type          String
+  address       Address?   @relation(fields: [addressId], references: [id])
+  addressId     String?    @unique
   company       Company?
   person        Person?
   documentsFrom Document[] @relation("DocumentFrom")
@@ -47,15 +61,14 @@ model Entity {
 }
 
 model Company {
-  id                String   @id @default(cuid())
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  entity           Entity   @relation(fields: [entityId], references: [id])
-  entityId         String   @unique
-  name             String
-  address          String
-  sirenNumber      String
-  incorporationDate DateTime
+  id                 String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  entity             Entity   @relation(fields: [entityId], references: [id])
+  entityId           String   @unique
+  name               String
+  sirenNumber        String
+  incorporationDate  DateTime
   incorporationPlace String
 }
 
@@ -69,7 +82,6 @@ model Person {
   lastName    String
   birthDate   DateTime
   birthPlace  String
-  address     String
   nationality String
 }
 
@@ -77,14 +89,14 @@ model Document {
   id            String         @id @default(cuid())
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  revision      Int           @default(1)
+  revision      Int            @default(1)
   jurisdiction  String
   name          String
-  user          User          @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
   userId        String
-  fromEntity    Entity        @relation("DocumentFrom", fields: [fromEntityId], references: [id])
+  fromEntity    Entity         @relation("DocumentFrom", fields: [fromEntityId], references: [id])
   fromEntityId  String
-  toEntity      Entity        @relation("DocumentTo", fields: [toEntityId], references: [id])
+  toEntity      Entity         @relation("DocumentTo", fields: [toEntityId], references: [id])
   toEntityId    String
   signatureDate DateTime?
   status        DocumentStatus @default(DRAFT)
