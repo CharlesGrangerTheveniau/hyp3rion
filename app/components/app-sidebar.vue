@@ -63,14 +63,16 @@
         ],
         [
             {
-                label: 'Documents',
+                label: 'Clients',
                 icon: 'i-heroicons-document-text',
-                to: '/getting-started/installation'
+                to: '/getting-started/installation',
+                badge: 100,
             }, 
             { 
-                label: 'Entities',
+                label: 'Operations',
                 icon: 'i-heroicons-chart-bar',
-                to: '/components/vertical-navigation'
+                to: '/components/vertical-navigation',
+                badge: 100,
             },
             { 
                 label: 'Contacts',
@@ -93,7 +95,6 @@
             avatar: {
                 src: user.value?.user_metadata.avatar_url
             },
-            badge: 100,
             to: '/profile'
         },
         {

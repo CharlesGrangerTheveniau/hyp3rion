@@ -3,12 +3,14 @@
     <div class="relative flex flex-row w-full">
       <!-- Mobile slideover -->
 
-        <USlideover side="left" :ui="{
+        <USlideover 
+          side="left" 
+          :ui="{
             content: 'divide-none',
-        }">
+          }">
             <div class="lg:hidden w-full fixed top-0 left-0 z-40 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 p-4 shadow-sm flex flex-row justify-between items-center">
                 <div>🔥</div>
-                <UButton icon="i-heroicons-bars-3" color="gray" variant="ghost" />
+                <UButton icon="i-heroicons-bars-3" color="primary" variant="ghost" />
             </div>
             <template #body>
                 <div class="flex flex-col justify-between h-full bg-white dark:bg-gray-900">
@@ -31,7 +33,7 @@
             class="fixed hidden lg:flex flex-col justify-between h-screen w-[25%] bg-white dark:bg-gray-900 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)] p-8 z-50 transition-all duration-300"
             @mouseleave="isNavFixed ? null : isDesktopMenuOpen = false">
             
-            <Sidebar 
+            <AppSidebar 
               type="desktop" 
               :nav-fixed="isNavFixed"
               @update:nav-fixed="isNavFixed = $event"/>
@@ -57,7 +59,7 @@
   </template>
   
   <script lang="ts" setup>
-  import Sidebar from '~/components/Sidebar.vue'
+  import AppSidebar from '~/components/app-sidebar.vue'
   const user = useSupabaseUser()
   
   // Menu state

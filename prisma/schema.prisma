@@ -21,84 +21,189 @@ enum DocumentStatus {
   REJECTED
 }
 
-model Address {
-  id        String     @id @default(uuid())
-  line1     String
-  line2     String?
-  city      String
-  zip       String
-  country   String
-  entity    Entity?
-}
-
-model User {
-  id        String     @id @default(uuid())
-  firstName String?
-  lastName  String?
-  fullName  String?
-  phone     String?
-  avatarUrl String?
-  email     String     @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  entities  Entity[]
-  documents Document[]
+model Client {
+  id          String       @id @default(dbgenerated("'c_' || substr(md5(random()::text), 1, 10)"))
+  entityId    String       @unique
+  entity      Entity       @relation("ClientEntity", fields: [entityId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  firmId      String
+  firm        Firm         @relation(fields: [firmId], references: [id])
+  name        String
+  permissions Permission[]
+  operations  Operation[]
+  documents   Document[]
 }
 
 model Entity {
-  id            String     @id @default(cuid())
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  user          User       @relation(fields: [userId], references: [id])
-  userId        String
-  type          String
-  address       Address?   @relation(fields: [addressId], references: [id])
-  addressId     String?    @unique
-  company       Company?
-  person        Person?
-  documentsFrom Document[] @relation("DocumentFrom")
-  documentsTo   Document[] @relation("DocumentTo")
+  id          String      @id @default(dbgenerated("'e_' || substr(md5(random()::text), 1, 10)"))
+  clientId    String?     @unique
+  client      Client?     @relation("ClientEntity")
+  firmId      String?     @unique
+  firm        Firm?       @relation("FirmEntity")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  type        EntityType
+  person      Person?
+  company     Company?
+  role        EntityRole?
+  signatories Signatory[]
 }
 
-model Company {
-  id                 String   @id @default(cuid())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  entity             Entity   @relation(fields: [entityId], references: [id])
-  entityId           String   @unique
-  name               String
-  sirenNumber        String
-  incorporationDate  DateTime
-  incorporationPlace String
+enum EntityRole {
+  CLIENT
+  DIRECTOR
+  SHAREHOLDER
+  INVESTOR
+  FOUNDER
+  TEAM
 }
 
 model Person {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  entity      Entity   @relation(fields: [entityId], references: [id])
-  entityId    String   @unique
+  id          String    @id @default(dbgenerated("'p_' || substr(md5(random()::text), 1, 10)"))
+  entityId    String    @unique
+  entity      Entity    @relation(fields: [entityId], references: [id])
   firstName   String
   lastName    String
-  birthDate   DateTime
-  birthPlace  String
-  nationality String
+  email       String?
+  phone       String?
+  birthDate   DateTime?
+  birthPlace  String?
+  nationality String?
+  gender      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Company {
+  id        String   @id @default(dbgenerated("'comp_' || substr(md5(random()::text), 1, 10)"))
+  entityId  String   @unique
+  entity    Entity   @relation(fields: [entityId], references: [id])
+  name      String
+  siren     String?  @unique
+  type      String?
+  address   String?
+  capital   Int? // Changed from Number to Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EntityType {
+  PERSON
+  COMPANY
+}
+
+model Operation {
+  id        String          @id @default(dbgenerated("'op_' || substr(md5(random()::text), 1, 10)"))
+  clientId  String
+  client    Client          @relation(fields: [clientId], references: [id])
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  type      OperationType
+  status    OperationStatus
+  documents Document[]
+  metadata  Json
 }
 
 model Document {
-  id            String         @id @default(cuid())
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  revision      Int            @default(1)
-  jurisdiction  String
-  name          String
-  user          User           @relation(fields: [userId], references: [id])
-  userId        String
-  fromEntity    Entity         @relation("DocumentFrom", fields: [fromEntityId], references: [id])
-  fromEntityId  String
-  toEntity      Entity         @relation("DocumentTo", fields: [toEntityId], references: [id])
-  toEntityId    String
-  signatureDate DateTime?
-  status        DocumentStatus @default(DRAFT)
-  metadata      Json
+  id          String         @id @default(dbgenerated("'doc_' || substr(md5(random()::text), 1, 10)"))
+  operationId String
+  operation   Operation      @relation(fields: [operationId], references: [id])
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  name        String
+  type        DocumentType
+  status      DocumentStatus
+  metadata    Json?
+  signatories Signatory[]
+}
+
+model Signatory {
+  id         String   @id @default(dbgenerated("'sig_' || substr(md5(random()::text), 1, 10)"))
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  entityId   String
+  entity     Entity   @relation(fields: [entityId], references: [id])
+  name       String
+  role       String
+}
+
+model Address {
+  id        String   @id @default(dbgenerated("'adr_' || substr(md5(random()::text), 1, 10)"))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  line1     String
+  line2     String
+  city      String
+  zipCode   String
+  country   String
+}
+
+model User {
+  id          String       @id @default(dbgenerated("'u_' || substr(md5(random()::text), 1, 10)"))
+  firstName   String?
+  lastName    String?
+  fullName    String?
+  email       String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  connected   Boolean      @default(false)
+  avatar      String?
+  permissions Permission[]
+}
+
+model Firm {
+  id          String       @id @default(dbgenerated("'f_' || substr(md5(random()::text), 1, 10)"))
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[]
+  clients     Client[]
+  entityId    String?       @unique
+  entity      Entity?       @relation("FirmEntity", fields: [entityId], references: [id])
+  status      FirmStatus   @default(UNCERTIFIED)
+}
+
+enum FirmStatus {
+  CERTIFIED
+  UNCERTIFIED
+}
+
+model Permission {
+  id         String         @id @default(dbgenerated("'fp_' || substr(md5(random()::text), 1, 10)"))
+  firmId     String?
+  firm       Firm?          @relation(fields: [firmId], references: [id])
+  clientId   String?
+  client     Client?        @relation(fields: [clientId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  user       User           @relation(fields: [userId], references: [id])
+  userId     String
+  permission PermissionType
+}
+
+enum PermissionType {
+  READ_ONLY
+  ADMIN
+}
+
+enum OperationType {
+  CREATION
+  MODIFICATION
+  DELETION
+}
+
+enum OperationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum DocumentType {
+  NDA
+  CONTRACT
+  INVOICE
+  OTHER
 }

@@ -53,15 +53,16 @@ export interface User extends UserProfile {
     documents: Document[]
 }
 
-export interface Company extends Entity {
+export interface Company {
     id: string
     name: string
     sirenNumber: string
+    type: string
     incorporationDate: Date
     incorporationPlace: string
 }
 
-export interface Person extends Entity {
+export interface Person {
     id: string
     firstName: string
     lastName: string

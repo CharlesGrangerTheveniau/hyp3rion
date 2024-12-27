@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="max-w-4xl mx-auto p-6">
     <h1 class="text-3xl font-bold mb-2">My Profile</h1>
@@ -49,19 +50,19 @@
           class="space-y-6" 
           @submit="saveChanges">
           <div class="flex flex-row gap-4">
-            <UFormField label="First Name" class="w-full">
-              <UInput v-model="profile.firstName" trailing-icon="i-lucide-user" placeholder="Enter your first name" class="w-full"/>
+            <UFormField size="lg" label="First Name" class="w-full">
+              <UInput v-model="profile.firstName" size="lg" trailing-icon="i-lucide-user" placeholder="Enter your first name" class="w-full"/>
             </UFormField>
-            <UFormField label="Last Name" class="w-full">
-              <UInput v-model="profile.lastName" trailing-icon="i-lucide-user" placeholder="Enter your last name" class="w-full"/>
+            <UFormField size="lg" label="Last Name" class="w-full">
+              <UInput v-model="profile.lastName" size="lg" trailing-icon="i-lucide-user" placeholder="Enter your last name" class="w-full"/>
             </UFormField>
           </div>
           <div class="flex flex-row gap-4">
-            <UFormField label="Email" class="w-full">
-              <UInput v-model="profile.email" trailing-icon="i-lucide-at-sign" placeholder="Enter your email" class="w-full"/>
+            <UFormField size="lg" label="Email" class="w-full">
+              <UInput v-model="profile.email" size="lg" trailing-icon="i-lucide-at-sign" placeholder="Enter your email" class="w-full"/>
             </UFormField>
-            <UFormField label="Phone Number (optional)" class="w-full">
-              <UInput v-model="profile.phone" trailing-icon="i-lucide-phone" placeholder="Enter your phone number" class="w-full"/>
+            <UFormField size="lg" label="Phone Number (optional)" class="w-full">
+              <UInput v-model="profile.phone" size="lg" trailing-icon="i-lucide-phone" placeholder="Enter your phone number" class="w-full"/>
             </UFormField>
           </div>
         </UForm>
@@ -73,11 +74,11 @@
           class="flex flex-col gap-4"
           @submit="saveChanges">
 
-          <UInput v-model="address.line1" placeholder="Line 1" class="w-full"/>
-          <UInput v-model="address.line2" placeholder="Line 2" class="w-full"/>
-          <UInput v-model="address.city" placeholder="City" class="w-full"/>
-          <UInput v-model="address.zip" placeholder="Zip" class="w-full"/>
-          <UInput v-model="address.country" placeholder="Country" class="w-full"/>
+          <UInput v-model="address.line1" size="lg" placeholder="Line 1" class="w-full"/>
+          <UInput v-model="address.line2" size="lg" placeholder="Line 2" class="w-full"/>
+          <UInput v-model="address.city" size="lg" placeholder="City" class="w-full"/>
+          <UInput v-model="address.zip" size="lg" placeholder="Zip" class="w-full"/>
+          <UInput v-model="address.country" size="lg" placeholder="Country" class="w-full"/>
 
         </UForm>
 
@@ -86,16 +87,16 @@
           class="flex flex-col gap-4"
           @submit="saveChanges">
 
-            <UFormField label="Birth Date" class="w-full">
-              <UInput v-model="profile.birthDate" trailing-icon="i-lucide-calendar" placeholder="Enter your birth date" class="w-full"/>
+            <UFormField size="lg" label="Birth Date" class="w-full">
+              <UInput v-model="profile.birthDate" size="lg" trailing-icon="i-lucide-calendar" placeholder="Enter your birth date" class="w-full"/>
             </UFormField>
 
-            <UFormField label="Birth Place" class="w-full">
-              <UInput v-model="profile.birthPlace" trailing-icon="i-lucide-map-pin" placeholder="Enter your birth place" class="w-full"/>
+            <UFormField size="lg" label="Birth Place" class="w-full">
+              <UInput v-model="profile.birthPlace" size="lg" trailing-icon="i-lucide-map-pin" placeholder="Enter your birth place" class="w-full"/>
             </UFormField>
 
-            <UFormField label="Nationality" class="w-full">
-              <UInput v-model="profile.nationality" trailing-icon="i-lucide-flag" placeholder="Enter your nationality" class="w-full"/>
+            <UFormField size="lg" label="Nationality" class="w-full">
+              <UInput v-model="profile.nationality" size="lg" trailing-icon="i-lucide-flag" placeholder="Enter your nationality" class="w-full"/>
             </UFormField>
 
         </UForm>
@@ -109,15 +110,7 @@
 
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg">
       <h2 class="text-xl font-semibold mb-4">Organisations</h2>
-      <p class="text-gray-500 dark:text-gray-400 mb-4">
-        Regular password changes help enhance your account security.
-      </p>
-      <button 
-        class="text-primary hover:underline"
-        @click="changePassword"
-      >
-        Change password
-      </button>
+      <CompanySearch @company-added="addCompany($event)" />
     </div>
 
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg">
@@ -139,6 +132,7 @@
 import { ref, reactive } from 'vue'
 import { getUser, getUserInfo, updateUser } from '../services/user-service'
 import { getAddressForUser } from '~/services/address-service'
+import type { PappersCompany } from '~/services/pappers-service'
 const user = useSupabaseUser()
 
 definePageMeta({
@@ -185,6 +179,11 @@ function removeImage() {
   if (fileInput.value) {
     fileInput.value.value = ''
   }
+}
+
+function addCompany(company: PappersCompany) {
+  console.log(company)
+  console.log(company.name)
 }
 
 async function saveChanges() {
