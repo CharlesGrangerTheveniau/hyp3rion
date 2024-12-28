@@ -3,84 +3,97 @@
 <script lang="ts" setup>
 import AvailablePermissionsModal from '~/components/available-permissions-modal.vue'
 import NoPermissionsModal from '~/components/no-permissions-modal.vue'
-
+import type { User, Permissions } from '~~/server/types'
 
 
 const user = useSupabaseUser()
 const router = useRouter()
 const modal = useModal()
 
-const showNoPermissions = () => {
+const showNoPermissions = (user: User) => {
+  console.log('showing no permissions')
   modal.open(NoPermissionsModal, {
     title: 'Access Denied',
-    dismissible: false
+    dismissible: false,
+    user: user
   })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const showAvailablePermissions = (permissions: any, user: any) => {
+const showAvailablePermissions = (permissions: any, userProfile: User) => {
   console.log('showing available permissions')
   modal.open(AvailablePermissionsModal, {
     title: 'Available Permissions',
-    permissions: permissions
+    permissions: permissions,
+    user: userProfile,
+    dismissible: false
   })
 }
 
 const entities = ref([])
 
-// This will run when the callback page loads
+const userProfile = ref<User | null>(null)
+
 onMounted(async () => {
+
+  // if user is connected (through auth provider, then we need to get the user profile || create a new user
+  // then get permissions for this user)
+
+
   if (user.value) {
     console.log('user', user.value)
+
+
     try {
-      const permissions = await $fetch('/api/permissions', {
+
+      // get user profile || create a new user
+      const userProfile = await $fetch<User>('/api/whoAmI', {
         headers: {
           'X-User-Data': JSON.stringify(user.value)
-        }
+        },
+        method: 'GET'
       })
+
+      console.log('userProfile', userProfile)
+
+      // at this point, we have a user profile with or without permissions
+
+
+      const permissions = await $fetch<Permissions>('/api/permissions/'+userProfile?.id)
+
+      const hasPermissions = permissions.firmPermissions.length > 0 || permissions.clientPermissions.length > 0
 
       console.log('permissions', permissions)
       
-      // If the user is connected, we need to redirect to the first permission
-      if (permissions.user.connected) {
-        const firstPermission = permissions.firmPermissions[0]?.id || permissions.clientPermissions[0]?.id
-        if (firstPermission) {
+      // If the user is connected
+      if (userProfile.connected) {
+        // and has permissions, we need to redirect to the first permission
+        if (hasPermissions) {
+          const firstPermission = permissions.firmPermissions[0]?.id || permissions.clientPermissions[0]?.id
           router.push(`/${firstPermission}`)
+        // if the user is connected but has no permissions, we need to show him a modal to request permissions || create a firm
         } else {
-          console.error('No valid permissions found')
-          showNoPermissions()
+          showNoPermissions(userProfile)
+        }
+      } else {
+        // if the user is not connected but has permissions, we need to show him available permissions to access
+        if (hasPermissions) {
+          showAvailablePermissions(permissions, userProfile)
+        // if the user is not connected but has no permissions, we need to show him a modal to request permissions || create a firm
+        } else {
+          showNoPermissions(userProfile)
         }
       }
-
-      // If the user is not connected but has permissions, we need to show him a modal 
-      if (!permissions.user.connected) {
-        showAvailablePermissions(permissions)
-      }
-
-
-
-
-
-      /* if (permissions.length > 0) {
-        if (permissions.some(p => p.firmId)) {
-          const entity = await $fetch(`/api/entities/${permissions.find(p => p.firmId)?.firmId}`)
-        }
-      } */
 
     } catch (error) {
-      if (error.response?.status === 403) {
-        // TODO: show a modal that allows the users to find a client || firm to request access to || create a firm 
-        showNoPermissions()
-      }
-      if (error.response?.status === 404) {
-        // TODO: show a modal that allows the users to create a user entity and find a company || firm to request access to || create a firm 
-        showNoPermissions()
-      }
+      console.error('Error fetching user profile or permissions:', error)
     }
+  } else {
+    console.error('Failed to authenticate user')
+    router.push('/login')
   }
 
 })
-
 
 </script>
 

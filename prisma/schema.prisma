@@ -146,11 +146,12 @@ model User {
   firstName   String?
   lastName    String?
   fullName    String?
-  email       String       @unique
+  email       String?      @unique
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   connected   Boolean      @default(false)
   avatar      String?
+  phone       String?
   permissions Permission[]
 }
 
@@ -161,8 +162,8 @@ model Firm {
   updatedAt   DateTime     @updatedAt
   permissions Permission[]
   clients     Client[]
-  entityId    String?       @unique
-  entity      Entity?       @relation("FirmEntity", fields: [entityId], references: [id])
+  entityId    String?      @unique
+  entity      Entity?      @relation("FirmEntity", fields: [entityId], references: [id])
   status      FirmStatus   @default(UNCERTIFIED)
 }
 
@@ -187,6 +188,8 @@ model Permission {
 enum PermissionType {
   READ_ONLY
   ADMIN
+  DENIED
+  PENDING
 }
 
 enum OperationType {
