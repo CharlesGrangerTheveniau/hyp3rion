@@ -1,8 +1,8 @@
 <!-- eslint-disable no-irregular-whitespace -->
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script lang="ts" setup>
-import AvailablePermissionsModal from '~/components/available-permissions-modal.vue'
-import NoPermissionsModal from '~/components/no-permissions-modal.vue'
+import AvailablePermissionsModal from '~/components/modals/available-permissions-modal.vue'
+import NoPermissionsModal from '~/components/modals/no-permissions-modal.vue'
 import type { User, Permissions } from '~~/server/types'
 
 

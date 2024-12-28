@@ -10,22 +10,9 @@ export const getUser = async (userSession: any) => {
         },
         method: 'GET'
     })
-
-    user.entities = await $fetch<Entity[]>('/api/entities/getEntities', {
-        headers: {
-            'X-User-Id': JSON.stringify(user.id)
-        }
-    })
-
-    user.documents = await $fetch<Document[]>('/api/documents/getDocuments', {
-        headers: {
-            'X-User-Id': JSON.stringify(user.id)
-        }
-    })
-    
-
     return user
 }
+
 export const getUserInfo = (user: User) => {
     const personEntity = user.entities.find((entity) => entity.type === 'PERSON')?.person as Person
 

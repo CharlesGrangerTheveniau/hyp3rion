@@ -29,6 +29,7 @@
 </template>
 
 <script lang="ts" setup>
+    import { getUser, getUserProfile } from '~/services/user-service'
 
     const props = defineProps<{
         type: 'mobile' | 'desktop'
@@ -46,6 +47,10 @@
     })
 
     const user = useSupabaseUser()
+
+    const userProfile = getUser(user.value)
+
+
     const client = useSupabaseClient()
 
     const isNavFixed = computed({
@@ -91,9 +96,14 @@
   
     const bottomLinks = computed(() => [
         {
+            label: 'Firms',
+            icon: 'i-heroicons-building-office',
+            to: '/firms'
+        },
+        {
             label: 'Profile',
             avatar: {
-                src: user.value?.user_metadata.avatar_url
+                src: userProfile.avatar
             },
             to: '/profile'
         },

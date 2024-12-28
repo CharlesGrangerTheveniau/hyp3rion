@@ -7,7 +7,7 @@
       </div>
     </template>
     <template #body>
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4" ref="wrapperEl">
         <div v-if="props.permissions.firmPermissions.length > 0">
           <h3 class="text-lg font-bold mb-4">Firm Permissions</h3>
           <AuthorityCard
@@ -20,14 +20,23 @@
             :disabled="permission.permissionForUser == 'PENDING'"
           >
             <template #action>
-              <UButton 
+              <UButton
+                v-if="permission.permissionForUser === 'PENDING'"
                 color="primary"
                 variant="ghost" 
-                :disabled="permission.permissionForUser === 'PENDING'"
+                :disabled="true"
+              >
+                Access pending
+                <UIcon name="i-heroicons-information-circle" class="w-5 h-5" />
+              </UButton>
+              <UButton
+                v-else
+                color="primary"
+                variant="ghost" 
                 @click="connectUser(permission)"
               >
-                {{ permission.permissionForUser === "PENDING" ? 'Access pending' : 'Access' }}
-                <UIcon v-if="permission.permissionForUser !== 'PENDING'"  name="i-heroicons-arrow-right" class="w-5 h-5" />
+                Access
+                <UIcon  name="i-heroicons-arrow-right" class="w-5 h-5" />
               </UButton>
             </template>
           </AuthorityCard>
@@ -39,8 +48,11 @@
 
 <script lang="ts" setup>
 import type { User, Permissions, AuthorityWithPermissionForUser } from '~~/server/types'
-import AuthorityCard from './authority-card.vue'
+import AuthorityCard from '../cards/authority-card.vue'
 
+import { useAutoAnimate } from '@formkit/auto-animate/vue'
+
+const [wrapperEl] = useAutoAnimate()
 
 const modal = useModal()
 const props = defineProps<{
