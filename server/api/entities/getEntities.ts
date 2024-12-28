@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
 import { getAddress } from '~/services/address-service'
 import { getCompany, getPerson } from '~/services/entity-service'
 import type { Address } from '../addresses'
-import type { Company, Person } from '~/services/user-service'
 
 const prisma = new PrismaClient()
 
@@ -37,6 +36,28 @@ export interface Entity {
     name: string
     address: Address | null
     type: string
-    person: Person | null
-    company: Company | null
+}
+
+export interface CompanyEntity extends Entity {
+    type: 'COMPANY'
+    company: Company
+}
+
+export interface PersonEntity extends Entity {
+    type: 'PERSON'
+    person: Person
+}
+
+export interface Company {
+    sirenNumber: string
+    incorporationDate: string
+    type: string
+    incorporationPlace: string
+}
+
+export interface Person {
+    firstName: string
+    lastName: string
+    birthDate: string
+    birthPlace: string
 }

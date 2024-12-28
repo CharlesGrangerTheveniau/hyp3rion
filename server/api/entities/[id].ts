@@ -5,46 +5,25 @@ const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   const method = event.node.req.method
+  const id = getRouterParam(event, 'id')
 
-  switch (method) {
+  console.log('entity id:', id)
+
+  /* switch (method) {
     case 'GET':
       return await getUser(event)
-    case 'POST':
-      return await createUser(event)
+    
     case 'PATCH':
       return await patchUser(event)
-    /* case 'DELETE':
-      return await handleDeleteUser(event) */
+    
     default:
       throw createError({
         statusCode: 405,
         message: 'Method not allowed'
       })
-  }
+  } */
 })
 
-export const createUser = async (event: H3Event) => {
-    const body = await readBody(event)
-    const userSession = JSON.parse(
-        event.node.req.headers['x-user-data'] as string
-    )
-
-    const newUser = await prisma.user.create({
-        data: {
-            firstName: body.firstName,
-            lastName: body.lastName,
-            fullName: userSession.full_name || `${body.firstName} ${body.lastName}`,
-            email: userSession.email,
-            avatarUrl: userSession.avatar_url || '',
-            connected: true
-        }
-    })
-
-    return newUser
-}
-
-
-// ------------------------------------------------------------
 export const getUser = async (event: H3Event) => {
     const userSession = JSON.parse(
         event.node.req.headers['x-user-data'] as string
@@ -63,14 +42,22 @@ export const getUser = async (event: H3Event) => {
         }
     })
 
-    if (!user) {
-        throw createError({
-            statusCode: 404,
-            message: 'User not found'
-        })
+    if (user) {
+        return user
     }
 
-    return user
+    const newUser = await prisma.user.create({
+        data: {
+            id: userSession.id,
+            firstName: userSession.user_metadata.first_name || '',
+            lastName: userSession.user_metadata.last_name || '',
+            fullName: userSession.user_metadata.full_name || '',
+            email: userSession.email,
+            avatarUrl: userSession.user_metadata.avatar_url || ''
+        }
+    })
+
+    return newUser
 }
 
 export interface UserProfile {
@@ -109,7 +96,11 @@ export const patchUser = async (event: H3Event) => {
         id: userId
       },
       data: {
-        ...body
+        firstName: body.firstName,
+        lastName: body.lastName,
+        email: body.email,
+        phone: body.phone,
+        avatarUrl: body.avatarUrl
       }
     })
   

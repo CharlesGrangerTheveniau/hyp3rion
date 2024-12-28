@@ -12,21 +12,53 @@
           </p>
         </div>
         
-        <div class="input-group">
-          <input 
-            type="email" 
-            placeholder="account email"
-            v-model="email"
-            class="email-input"
+        <UButtonGroup class="flex w-full gap-2">
+          <USelectMenu
+            v-model="phoneCode"
+            size="xl"
+            :items="codes"
+            value-key="value"
+            label-key="label"
+            filter-fields="['label', 'value']"
+            :search-input="{ icon: 'i-lucide-search' }"
+            class="w-32"
+          >
+            <template #leading="{ modelValue }">
+              <UIcon 
+                v-if="modelValue" 
+                :name="`twemoji:flag-${modelValue.label}`" 
+                class="w-5 h-5"
+              />
+              <UIcon 
+                v-else 
+                name="i-lucide-earth" 
+                class="w-5 h-5"
+              />
+            </template>
+            
+            <template #item="{ item }">
+              <div class="flex items-center gap-2">
+                <UIcon :name="`twemoji:flag-${item.label}`" class="w-5 h-5" />
+                <span>{{ item.value }}</span>
+              </div>
+            </template>
+          </USelectMenu>
+          <UInput
+            v-model="phone"
+            size="xl"
+            placeholder="Enter your phone number"
+            class="flex-1"
           />
-          <button class="submit-btn">
-            <Icon name="material-symbols:arrow-forward-rounded" />
-          </button>
-        </div>
+          <UButton size="xl" class="shrink-0" @click="phoneLogin()">
+            <UIcon name="i-lucide-send"/>
+          </UButton>
+            
+          
+        </UButtonGroup>
   
         <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
-          <button v-on:click="login('google')" class="google-btn">
-            <img src="/google.png" alt="Google" />
+          <button @click="login('google')" class="google-btn">
+            <img src="/google.png" alt="Google" >
             Signup with Google
           </button>
   
@@ -39,10 +71,105 @@
   </template>
   
   <script lang="ts" setup>
-  const email = ref('')
-  const isInputFocused = ref(false)
+  import type { Provider } from '@supabase/supabase-js'
+
+  interface PhoneCode {
+    label: string
+    value: string
+  }
+
+  const phone = ref('')
+  const phoneCode = ref<PhoneCode>({ label: 'france', value: '+33' })
+
   
-  watch(email, (newVal) => {
+
+  const codes = ref([
+    { label: 'afghanistan', value: '+93' },
+    { label: 'albania', value: '+355' },
+    { label: 'algeria', value: '+213' },
+    { label: 'andorra', value: '+376' },
+    { label: 'angola', value: '+244' },
+    { label: 'argentina', value: '+54' },
+    { label: 'armenia', value: '+374' },
+    { label: 'australia', value: '+61' },
+    { label: 'austria', value: '+43' },
+    { label: 'azerbaijan', value: '+994' },
+    { label: 'bahrain', value: '+973' },
+    { label: 'bangladesh', value: '+880' },
+    { label: 'belarus', value: '+375' },
+    { label: 'belgium', value: '+32' },
+    { label: 'brazil', value: '+55' },
+    { label: 'bulgaria', value: '+359' },
+    { label: 'canada', value: '+1' },
+    { label: 'china', value: '+86' },
+    { label: 'colombia', value: '+57' },
+    { label: 'croatia', value: '+385' },
+    { label: 'cyprus', value: '+357' },
+    { label: 'czechia', value: '+420' },
+    { label: 'denmark', value: '+45' },
+    { label: 'egypt', value: '+20' },
+    { label: 'estonia', value: '+372' },
+    { label: 'finland', value: '+358' },
+    { label: 'france', value: '+33' },
+    { label: 'germany', value: '+49' },
+    { label: 'greece', value: '+30' },
+    { label: 'hong-kong-sar-china', value: '+852' },
+    { label: 'hungary', value: '+36' },
+    { label: 'iceland', value: '+354' },
+    { label: 'india', value: '+91' },
+    { label: 'indonesia', value: '+62' },
+    { label: 'iran', value: '+98' },
+    { label: 'iraq', value: '+964' },
+    { label: 'ireland', value: '+353' },
+    { label: 'israel', value: '+972' },
+    { label: 'italy', value: '+39' },
+    { label: 'japan', value: '+81' },
+    { label: 'jordan', value: '+962' },
+    { label: 'kazakhstan', value: '+7' },
+    { label: 'kenya', value: '+254' },
+    { label: 'kuwait', value: '+965' },
+    { label: 'latvia', value: '+371' },
+    { label: 'lebanon', value: '+961' },
+    { label: 'lithuania', value: '+370' },
+    { label: 'luxembourg', value: '+352' },
+    { label: 'malaysia', value: '+60' },
+    { label: 'malta', value: '+356' },
+    { label: 'mexico', value: '+52' },
+    { label: 'monaco', value: '+377' },
+    { label: 'morocco', value: '+212' },
+    { label: 'netherlands', value: '+31' },
+    { label: 'new-zealand', value: '+64' },
+    { label: 'norway', value: '+47' },
+    { label: 'pakistan', value: '+92' },
+    { label: 'philippines', value: '+63' },
+    { label: 'poland', value: '+48' },
+    { label: 'portugal', value: '+351' },
+    { label: 'qatar', value: '+974' },
+    { label: 'romania', value: '+40' },
+    { label: 'russia', value: '+7' },
+    { label: 'saudi-arabia', value: '+966' },
+    { label: 'singapore', value: '+65' },
+    { label: 'slovakia', value: '+421' },
+    { label: 'slovenia', value: '+386' },
+    { label: 'south-africa', value: '+27' },
+    { label: 'south-korea', value: '+82' },
+    { label: 'spain', value: '+34' },
+    { label: 'sweden', value: '+46' },
+    { label: 'switzerland', value: '+41' },
+    { label: 'taiwan', value: '+886' },
+    { label: 'thailand', value: '+66' },
+    { label: 'turkey', value: '+90' },
+    { label: 'ukraine', value: '+380' },
+    { label: 'united-arab-emirates', value: '+971' },
+    { label: 'united-kingdom', value: '+44' },
+    { label: 'united-states', value: '+1' },
+    { label: 'vietnam', value: '+84' }
+  ])
+
+  const isInputFocused = ref(false)
+
+  
+  watch(phone, (newVal) => {
     if (newVal.length > 0) {
       isInputFocused.value = true
       console.log('input focused')
@@ -55,14 +182,23 @@
   const client = useSupabaseClient()
   
   
-  const login = async (provider: string) => {
-    console.log('logging in with',provider)
+  const login = async (provider: Provider) => {
+    console.log('logging in with', provider)
     await client.auth.signInWithOAuth({
-      provider: provider,
+      provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`
       }
     })
+  }
+
+  const phoneLogin = async () => {
+    const phoneNumber = phoneCode.value.value + phone.value
+    console.log(phoneNumber)
+    const send = await client.auth.signInWithOtp({
+      phone: phoneNumber,
+    })
+    console.log(send)
   }
   
   </script>
@@ -79,7 +215,7 @@
   
   .auth-content {
     text-align: center;
-    max-width: 400px;
+    max-width: 500px;
     padding: 2rem;
   }
   
