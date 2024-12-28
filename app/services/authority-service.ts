@@ -1,4 +1,4 @@
-import type { Authority } from "~/components/no-permissions-modal.vue"
+import type { Authority } from "~~/server/types"
 
 export const searchAuthorities = async (input: string) => {
     const response = await $fetch<unknown>(

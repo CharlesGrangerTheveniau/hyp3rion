@@ -18,9 +18,18 @@
             v-for="result in results" 
             :key="result.id"
             :authority="result"
-            button-label="Request access"
-            @select="requestPermissions"
-          />
+          >
+            <template #action>
+              <UButton 
+                color="primary"
+                variant="ghost" 
+                @click="requestPermissions(result)"
+              >
+                Request access
+                <UIcon  name="i-heroicons-arrow-right" class="w-5 h-5" />
+              </UButton>
+            </template>
+          </AuthorityCard>
         </div>
 
       
@@ -38,19 +47,13 @@
 import { searchAuthorities } from '~/services/authority-service'
 import { requestPermission } from '~/services/permission-service';
 import ConfirmModal from './confirm-modal.vue'
-  import type { CompanyMetadata, User } from '~~/server/types';
+import type { Authority, User } from '~~/server/types';
   const modal = useModal()
   const props = defineProps<{
     user: User
   }>()
 
-  export interface Authority {
-    id: string
-    name: string
-    type: "firm" | "client"
-    createdAt: Date
-    company: CompanyMetadata
-  }
+  
 
 
   const searchTerm = ref('')

@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex flex-col gap-4">
         <h1 class="text-2xl font-bold">Nice to see you {{ props.user.fullName }}!</h1>
-        <p class="text-lg">You've been granted access to the following permissions</p>
+        <p class="text-lg">{{ headerMessage }}</p>
       </div>
     </template>
     <template #body>
@@ -13,26 +13,24 @@
           <AuthorityCard
             v-for="permission in props.permissions.firmPermissions"
             :key="permission.id"
-            button-label="Access"
             :authority="{
               ...permission,
-              type: 'firm',
-            } as Authority"
-            @select="connectUser"
-          />
-        </div>
-        <div v-if="props.permissions.clientPermissions.length > 0">
-          <h3 class="text-lg font-bold mb-4">Client Permissions</h3>
-          <AuthorityCard
-            v-for="permission in props.permissions.clientPermissions"
-            :key="permission.id"
-            button-label="Access"
-            :authority="{
-              ...permission,
-              type: 'client',
-            } as Authority"
-            @select="connectUser"
-          />
+              type: 'firm' as const
+            }"
+            :disabled="permission.permissionForUser == 'PENDING'"
+          >
+            <template #action>
+              <UButton 
+                color="primary"
+                variant="ghost" 
+                :disabled="permission.permissionForUser === 'PENDING'"
+                @click="connectUser(permission)"
+              >
+                {{ permission.permissionForUser === "PENDING" ? 'Access pending' : 'Access' }}
+                <UIcon v-if="permission.permissionForUser !== 'PENDING'"  name="i-heroicons-arrow-right" class="w-5 h-5" />
+              </UButton>
+            </template>
+          </AuthorityCard>
         </div>
       </div>
     </template>
@@ -40,18 +38,24 @@
 </template>
 
 <script lang="ts" setup>
-import type { User, Permissions } from '~~/server/types'
+import type { User, Permissions, AuthorityWithPermissionForUser } from '~~/server/types'
 import AuthorityCard from './authority-card.vue'
-import type { Authority } from './no-permissions-modal.vue';
 
 
 const modal = useModal()
 const props = defineProps<{
   permissions: Permissions,
-  user: User
+  user: User,
+  hasOnlyPendingPermissions: boolean
 }>()
 
-async function connectUser(permission: any) {
+const headerMessage = computed(() => {  
+  return props.hasOnlyPendingPermissions
+    ? "Your access requests are being reviewed"
+    : "You've been granted access to the following permissions"
+})
+
+async function connectUser(permission: AuthorityWithPermissionForUser) {
   await $fetch(`/api/users`, {
     method: 'PATCH',
     body: {

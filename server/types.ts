@@ -1,4 +1,4 @@
-import type { EntityType, PermissionType } from "@prisma/client"
+import type { EntityType } from "@prisma/client"
 
 export interface Firm {
     id: string
@@ -79,8 +79,8 @@ export interface EntityMetadata {
 }
 
 export interface Permissions {
-    firmPermissions: Firm[]
-    clientPermissions: Client[]
+    firmPermissions: AuthorityWithPermissionForUser[]
+    clientPermissions: AuthorityWithPermissionForUser[]
     user: User
 }
 
@@ -102,3 +102,22 @@ export interface Permission {
     clientId: string
     permission: PermissionType
 }
+
+export enum PermissionType {
+    PENDING = 'PENDING',
+    ADMIN = 'ADMIN',
+    READ_ONLY = 'READ_ONLY',
+    DENIED = 'DENIED'
+}
+
+export interface Authority {
+    id: string
+    name: string
+    type: "firm" | "client"
+    createdAt: Date
+    company: CompanyMetadata
+  }
+
+  export interface AuthorityWithPermissionForUser extends Authority {
+    permissionForUser: PermissionType
+  }

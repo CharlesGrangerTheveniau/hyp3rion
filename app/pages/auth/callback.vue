@@ -20,13 +20,14 @@ const showNoPermissions = (user: User) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const showAvailablePermissions = (permissions: any, userProfile: User) => {
+const showAvailablePermissions = (permissions: any, userProfile: User, hasOnlyPendingPermissions: boolean) => {
   console.log('showing available permissions')
   modal.open(AvailablePermissionsModal, {
     title: 'Available Permissions',
     permissions: permissions,
     user: userProfile,
-    dismissible: false
+    dismissible: false,
+    hasOnlyPendingPermissions
   })
 }
 
@@ -61,6 +62,12 @@ onMounted(async () => {
 
       const permissions = await $fetch<Permissions>('/api/permissions/'+userProfile?.id)
 
+      const hasFirmPermissions = permissions.firmPermissions.length > 0
+      const hasClientPermissions = permissions.clientPermissions.length > 0
+
+      const hasOnlyPendingPermissions = hasFirmPermissions && permissions.firmPermissions.every(permission => permission.permissionForUser === 'PENDING') 
+        || hasClientPermissions && permissions.clientPermissions.every(permission => permission.permissionForUser === 'PENDING')
+
       const hasPermissions = permissions.firmPermissions.length > 0 || permissions.clientPermissions.length > 0
 
       console.log('permissions', permissions)
@@ -78,7 +85,7 @@ onMounted(async () => {
       } else {
         // if the user is not connected but has permissions, we need to show him available permissions to access
         if (hasPermissions) {
-          showAvailablePermissions(permissions, userProfile)
+          showAvailablePermissions(permissions, userProfile, hasOnlyPendingPermissions)
         // if the user is not connected but has no permissions, we need to show him a modal to request permissions || create a firm
         } else {
           showNoPermissions(userProfile)

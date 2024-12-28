@@ -17,7 +17,8 @@
             v-model="phoneCode"
             size="xl"
             :items="codes"
-            label-key="value"
+            value-key="value"
+            label-key="label"
             filter-fields="['label', 'value']"
             :search-input="{ icon: 'i-lucide-search' }"
             class="w-32"
@@ -56,8 +57,8 @@
         </UButtonGroup>
   
         <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
-          <button v-on:click="login('google')" class="google-btn">
-            <img src="/google.png" alt="Google" />
+          <button @click="login('google')" class="google-btn">
+            <img src="/google.png" alt="Google" >
             Signup with Google
           </button>
   
@@ -70,8 +71,15 @@
   </template>
   
   <script lang="ts" setup>
+  import type { Provider } from '@supabase/supabase-js'
+
+  interface PhoneCode {
+    label: string
+    value: string
+  }
+
   const phone = ref('')
-  const phoneCode = ref({ label: 'france', value: '+33' })
+  const phoneCode = ref<PhoneCode>({ label: 'france', value: '+33' })
 
   
 
@@ -174,10 +182,10 @@
   const client = useSupabaseClient()
   
   
-  const login = async (provider: string) => {
-    console.log('logging in with',provider)
+  const login = async (provider: Provider) => {
+    console.log('logging in with', provider)
     await client.auth.signInWithOAuth({
-      provider: provider,
+      provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`
       }
