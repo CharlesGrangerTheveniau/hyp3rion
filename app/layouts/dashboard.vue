@@ -60,11 +60,30 @@
   
   <script lang="ts" setup>
   import AppSidebar from '~/components/app-sidebar.vue'
-  const user = useSupabaseUser()
+  const userSession = useSupabaseUser()
+  if (!userSession.value) {
+    navigateTo('/login')
+  }
+
+  const userStore = useUserStore()
+  const route = useRoute()
   
   // Menu state
   const isDesktopMenuOpen = ref(true)
   const isNavFixed = ref(true)
+
+  onMounted(async () => {
+    if (userSession.value) {
+      await userStore.fetchUserAndPermissions(userSession.value)
+      const hasPermission = userStore.hasUrlPermission(route.path)
+      if (!hasPermission) {
+        console.log(`user ${userStore.user?.id} has no permission for authority ${route.path}`)
+        navigateTo('/auth/callback')
+      } else {
+        console.log(`user ${userStore.user?.id} has permission for authority ${route.path}`)
+      }
+    }
+  })
 
   
   // Auto-close desktop menu when mouse leaves
@@ -74,14 +93,7 @@
       isDesktopMenuOpen.value = false
     }
   }
-  
-  // Watch for user authentication
-  watch(user, () => {
-    if(!user.value){
-      navigateTo('/login')
-    }
-  })
-  
+    
 
     defineShortcuts({
         meta_o: () => {

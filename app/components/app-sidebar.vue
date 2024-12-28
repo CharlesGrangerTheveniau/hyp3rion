@@ -29,72 +29,94 @@
 </template>
 
 <script lang="ts" setup>
-    import { getUser, getUserProfile } from '~/services/user-service'
+import { useUserStore } from '~/stores/userStore';
 
-    const props = defineProps<{
-        type: 'mobile' | 'desktop'
-        navFixed?: boolean
-    }>()
+// ----------------
+// Props & Emits
+// ----------------
+const props = defineProps<{
+    type: 'mobile' | 'desktop'
+    navFixed?: boolean
+}>()
 
-    const emit = defineEmits<{
-        'update:navFixed': [value: boolean]
-    }>()
+const emit = defineEmits<{
+    'update:navFixed': [value: boolean]
+}>()
 
-    const colorMode = useColorMode()
-    const isDark = computed({
-        get: () => colorMode.value === 'dark',
-        set: (value) => colorMode.value = value ? 'dark' : 'light'
-    })
+// ----------------
+// Store & Services
+// ----------------
+const userStore = useUserStore()
+const client = useSupabaseClient()
+const colorMode = useColorMode()
 
-    const user = useSupabaseUser()
+// ----------------
+// Computed Properties
+// ----------------
+/**
+ * Controls the dark/light theme toggle
+ */
+const isDark = computed({
+    get: () => colorMode.value === 'dark',
+    set: (value) => colorMode.value = value ? 'dark' : 'light'
+})
 
-    const userProfile = getUser(user.value)
+/**
+ * Controls whether the navigation sidebar is fixed
+ */
+const isNavFixed = computed({
+    get: () => props.navFixed ?? false,
+    set: (value) => emit('update:navFixed', value)
+})
 
+// ----------------
+// Navigation Links
+// ----------------
+/**
+ * Primary navigation items displayed at the top of the sidebar
+ */
+const topLinks = [
+    [
+        {
+            label: 'Dashboard',
+            icon: 'i-heroicons-home',
+            to: '/dashboard'
+        }
+    ],
+    [
+        {
+            label: 'Clients',
+            icon: 'i-heroicons-document-text',
+            to: '/getting-started/installation',
+            badge: 100,
+        }, 
+        { 
+            label: 'Operations',
+            icon: 'i-heroicons-chart-bar',
+            to: '/components/vertical-navigation',
+            badge: 100,
+        },
+        { 
+            label: 'Contacts',
+            icon: 'i-heroicons-circle-stack',
+            to: '/components/vertical-navigation'
+        }
+    ], 
+    [
+        {
+            label: 'Request features',
+            icon: 'i-heroicons-command-line',
+            to: '/components/command-palette'
+        }
+    ]
+]
 
-    const client = useSupabaseClient()
-
-    const isNavFixed = computed({
-        get: () => props.navFixed ?? false,
-        set: (value) => emit('update:navFixed', value)
-    })
-  
-    const topLinks = [
-        [
-            {
-                label: 'Dashboard',
-                icon: 'i-heroicons-home',
-                to: '/dashboard'
-            }
-        ],
-        [
-            {
-                label: 'Clients',
-                icon: 'i-heroicons-document-text',
-                to: '/getting-started/installation',
-                badge: 100,
-            }, 
-            { 
-                label: 'Operations',
-                icon: 'i-heroicons-chart-bar',
-                to: '/components/vertical-navigation',
-                badge: 100,
-            },
-            { 
-                label: 'Contacts',
-                icon: 'i-heroicons-circle-stack',
-                to: '/components/vertical-navigation'
-            }
-        ], 
-        [
-            {
-                label: 'Request features',
-                icon: 'i-heroicons-command-line',
-                to: '/components/command-palette'
-            }
-        ]
-    ];
-  
-    const bottomLinks = computed(() => [
+/**
+ * Secondary navigation items displayed at the bottom of the sidebar
+ * Includes user-specific actions and theme toggle (mobile only)
+ */
+const bottomLinks = computed(() => {
+    const links = [
         {
             label: 'Firms',
             icon: 'i-heroicons-building-office',
@@ -103,7 +125,7 @@
         {
             label: 'Profile',
             avatar: {
-                src: userProfile.avatar
+                src: userStore.user?.avatar
             },
             to: '/profile'
         },
@@ -115,10 +137,11 @@
                 navigateTo('/')
             }
         }
-    ])
+    ]
 
+    // Add theme toggle for mobile view only
     if (props.type === 'mobile') {
-        bottomLinks.value.push({
+        links.push({
             label: isDark.value ? 'Dark Theme' : 'Light Theme',
             icon: isDark.value ? 'i-heroicons-moon' : 'i-heroicons-sun',
             onSelect: async () => {
@@ -127,6 +150,9 @@
             }
         })
     }
+
+    return links
+})
 </script>
 
 <style>

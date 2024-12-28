@@ -8,7 +8,8 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@nuxt/eslint",
     "@nuxtjs/supabase",
-    '@formkit/auto-animate'
+    '@formkit/auto-animate',
+    '@pinia/nuxt',
   ],
   css: ['~/assets/css/main.css'],
   supabase: {

@@ -10,7 +10,7 @@
               </p>
 
               <div class="flex flex-row justify-center gap-8">
-                  <NuxtLink :to="user ? '/dashboard' : '/login'">
+                  <NuxtLink :to="user ? '/auth/callback' : '/login'">
                       <UButton 
                         size="xl"
                         icon="material-symbols:add-circle"
