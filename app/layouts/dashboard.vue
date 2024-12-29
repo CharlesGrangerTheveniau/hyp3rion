@@ -1,6 +1,8 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <template>
+    
     <div class="relative flex flex-row w-full">
+      <SpeedInsights />
       <!-- Mobile slideover -->
 
         <USlideover 
@@ -60,6 +62,7 @@
   
   <script lang="ts" setup>
   import AppSidebar from '~/components/app-sidebar.vue'
+  import { SpeedInsights } from '@vercel/speed-insights/vue';
   const userSession = useSupabaseUser()
   if (!userSession.value) {
     navigateTo('/login')
