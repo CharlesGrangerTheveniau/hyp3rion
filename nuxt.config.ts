@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     '@formkit/auto-animate',
     '@pinia/nuxt',
+    'nuxt-resend'
   ],
   css: ['~/assets/css/main.css'],
   supabase: {

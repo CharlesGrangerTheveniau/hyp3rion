@@ -120,7 +120,7 @@ const bottomLinks = computed(() => {
         {
             label: 'Firms',
             icon: 'i-heroicons-building-office',
-            to: '/firms'
+            to: '/firm-details'
         },
         {
             label: 'Profile',
