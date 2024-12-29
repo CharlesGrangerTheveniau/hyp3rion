@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="flex flex-row items-center justify-between p-6 border border-gray-700 rounded-lg bg-gray-900/50 transition-colors mb-4">
+    class="flex flex-row items-center justify-between p-6 border border-gray-700 rounded-lg bg-gray-900/50 transition-colors">
     <div class="flex flex-row items-center gap-4">
       <div class="bg-emerald-500/20 p-4 rounded-lg">
         <UIcon 

@@ -81,7 +81,6 @@ export interface EntityMetadata {
 export interface Permissions {
     firmPermissions: AuthorityWithPermissionForUser[]
     clientPermissions: AuthorityWithPermissionForUser[]
-    user: User
 }
 
 export interface User {
@@ -91,7 +90,7 @@ export interface User {
     lastName: string
     fullName: string
     phone: string
-    avatarUrl: string
+    avatar: string
     connected: boolean
     permissions: Permission[]
 }

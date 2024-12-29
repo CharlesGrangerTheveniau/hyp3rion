@@ -5,9 +5,12 @@ export default defineNuxtConfig({
     preference: 'dark'
   },
   modules: [
-    "@nuxt/ui", 
+    "@nuxt/ui",
     "@nuxt/eslint",
     "@nuxtjs/supabase",
+    '@formkit/auto-animate',
+    '@pinia/nuxt',
+    'nuxt-resend'
   ],
   css: ['~/assets/css/main.css'],
   supabase: {

@@ -1,12 +1,14 @@
 <!-- eslint-disable no-irregular-whitespace -->
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script lang="ts" setup>
-import AvailablePermissionsModal from '~/components/available-permissions-modal.vue'
-import NoPermissionsModal from '~/components/no-permissions-modal.vue'
-import type { User, Permissions } from '~~/server/types'
+import AvailablePermissionsModal from '~/components/modals/available-permissions-modal.vue'
+import NoPermissionsModal from '~/components/modals/no-permissions-modal.vue'
+import { useUserStore } from '~/stores/userStore'
+import { type User, type Permissions, PermissionType } from '~~/server/types'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
 
-const user = useSupabaseUser()
+const userSession = useSupabaseUser()
 const router = useRouter()
 const modal = useModal()
 
@@ -31,67 +33,80 @@ const showAvailablePermissions = (permissions: any, userProfile: User, hasOnlyPe
   })
 }
 
+const allowedPermissions = [ 'ADMIN', 'READ_ONLY' ]
+
 const entities = ref([])
 
-const userProfile = ref<User | null>(null)
+const userStore = useUserStore()
+
+const checkValidPermissions = (permissions: Permissions | undefined) => {
+  if (!permissions) return false
+  
+  const firmPermissions = permissions.firmPermissions?.filter(p => 
+    allowedPermissions.includes(p.permissionForUser)
+  )
+  const clientPermissions = permissions.clientPermissions?.filter(p => 
+    allowedPermissions.includes(p.permissionForUser)
+  )
+  return (firmPermissions?.length > 0 || clientPermissions?.length > 0)
+}
+
+const findFirstValidFirmPermission = (permissions: Permissions | undefined) => {
+  if (!permissions) return null
+  return permissions.firmPermissions.find(p => allowedPermissions.includes(p.permissionForUser))
+}
+
+const findFirstValidClientPermission = (permissions: Permissions | undefined) => {
+  if (!permissions) return null
+  return permissions.clientPermissions.find(p => allowedPermissions.includes(p.permissionForUser))
+}
+
+const checkPendingPermissions = (permissions: Permissions | undefined) => {
+  if (!permissions) return false
+  
+  const firmPermissions = permissions.firmPermissions
+    ?.some(p => p.permissionForUser === 'PENDING')
+  const clientPermissions = permissions.clientPermissions
+    ?.some(p => p.permissionForUser === 'PENDING')
+
+  return (firmPermissions || clientPermissions)
+}
 
 onMounted(async () => {
-
-  // if user is connected (through auth provider, then we need to get the user profile || create a new user
-  // then get permissions for this user)
-
-
-  if (user.value) {
-    console.log('user', user.value)
-
-
+  if (userSession.value) {
     try {
+      const { user, permissions } = await userStore.fetchUserAndPermissions(userSession.value)
 
-      // get user profile || create a new user
-      const userProfile = await $fetch<User>('/api/whoAmI', {
-        headers: {
-          'X-User-Data': JSON.stringify(user.value)
-        },
-        method: 'GET'
-      })
+      const hasPendingPermissions = checkPendingPermissions(permissions)
 
-      console.log('userProfile', userProfile)
+      const hasValidGrantedPermissions = checkValidPermissions(permissions)
 
-      // at this point, we have a user profile with or without permissions
-
-
-      const permissions = await $fetch<Permissions>('/api/permissions/'+userProfile?.id)
-
-      const hasFirmPermissions = permissions.firmPermissions.length > 0
-      const hasClientPermissions = permissions.clientPermissions.length > 0
-
-      const hasOnlyPendingPermissions = hasFirmPermissions && permissions.firmPermissions.every(permission => permission.permissionForUser === 'PENDING') 
-        || hasClientPermissions && permissions.clientPermissions.every(permission => permission.permissionForUser === 'PENDING')
-
-      const hasPermissions = permissions.firmPermissions.length > 0 || permissions.clientPermissions.length > 0
-
-      console.log('permissions', permissions)
-      
-      // If the user is connected
-      if (userProfile.connected) {
-        // and has permissions, we need to redirect to the first permission
-        if (hasPermissions) {
-          const firstPermission = permissions.firmPermissions[0]?.id || permissions.clientPermissions[0]?.id
-          router.push(`/${firstPermission}`)
-        // if the user is connected but has no permissions, we need to show him a modal to request permissions || create a firm
+      // User has been previously connected
+      if (user.connected) {
+        if (hasValidGrantedPermissions) {
+          // Redirect to first valid permission
+          const firstValidFirmPermission = findFirstValidFirmPermission(permissions)
+          
+          if (firstValidFirmPermission) {
+            router.push(`/firm/${firstValidFirmPermission.id}/dashboard`)
+          } else {
+            router.push(`/client/${findFirstValidClientPermission(permissions)?.id}`)
+          }
+        } else if (hasPendingPermissions) {
+          // No valid permissions, show modal
+          showAvailablePermissions(permissions, user, hasPendingPermissions)
         } else {
-          showNoPermissions(userProfile)
+          showNoPermissions(user)
         }
-      } else {
-        // if the user is not connected but has permissions, we need to show him available permissions to access
-        if (hasPermissions) {
-          showAvailablePermissions(permissions, userProfile, hasOnlyPendingPermissions)
-        // if the user is not connected but has no permissions, we need to show him a modal to request permissions || create a firm
+      } 
+      // First time connection
+      else {
+        if (hasValidGrantedPermissions || hasPendingPermissions) {
+          showAvailablePermissions(permissions, user, hasPendingPermissions)
         } else {
-          showNoPermissions(userProfile)
+          showNoPermissions(user)
         }
       }
-
     } catch (error) {
       console.error('Error fetching user profile or permissions:', error)
     }
@@ -99,7 +114,6 @@ onMounted(async () => {
     console.error('Failed to authenticate user')
     router.push('/login')
   }
-
 })
 
 </script>

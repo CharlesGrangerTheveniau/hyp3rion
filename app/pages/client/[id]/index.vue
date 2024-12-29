@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-multiple-template-root -->
 <template>
-    <h1>Dashboard</h1>
+    <h1>Client Dashboard</h1>
     
 </template>
 

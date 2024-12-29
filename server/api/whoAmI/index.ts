@@ -20,13 +20,15 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!user) {
+        const { fullName, firstName, lastName } = getNameFromUserSession(userSession)
+
         const newUser = await prisma.user.create({
             data: {
                 email: userSession.email,
                 phone: userSession.phone,
-                firstName: userSession.user_metadata.firstName,
-                lastName: userSession.user_metadata.lastName,
-                fullName: userSession.user_metadata.fullName,
+                firstName,
+                lastName,
+                fullName,
                 avatar: userSession.user_metadata.avatar_url,
                 connected: false
             }
@@ -36,3 +38,26 @@ export default defineEventHandler(async (event) => {
 
     return user
 })
+
+function getNameFromUserSession(userSession: any) {
+
+    if (userSession.user_metadata.full_name) {
+        return { 
+            fullName: userSession.user_metadata.full_name,
+            firstName: userSession.user_metadata.full_name.split(' ')[0],
+            lastName: userSession.user_metadata.full_name.split(' ')[1]
+        }
+    } else if (userSession.user_metadata.first_name && userSession.user_metadata.last_name) {
+        return { 
+            fullName: userSession.user_metadata.first_name + ' ' + userSession.user_metadata.last_name,
+            firstName: userSession.user_metadata.first_name,
+            lastName: userSession.user_metadata.last_name
+        }
+    }
+
+    return {
+        fullName: '',
+        firstName: '',
+        lastName: ''
+    }
+}

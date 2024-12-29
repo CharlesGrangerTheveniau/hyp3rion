@@ -5,7 +5,7 @@
     </UFormField>
 
     <div v-for="company in companies" :key="company" class="space-y-4">
-      <UCard v-auto-animate :ui="{ body: 'w-full' }">
+      <UCard :ui="{ body: 'w-full' }">
         <div class="flex flex-row justify-between items-center">
             <div class="flex flex-col">
                 <i>{{ company.type }}</i>
@@ -26,7 +26,6 @@
 
 <script lang="ts" setup>
     import { searchCompany, type PappersCompany } from '~/services/pappers-service';
-    import { vAutoAnimate } from '@formkit/auto-animate'
     
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const emit = defineEmits<{

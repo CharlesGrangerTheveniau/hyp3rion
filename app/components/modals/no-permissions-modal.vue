@@ -10,12 +10,12 @@
     
     <template #body>
 
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4" ref="wrapperEl">
         <UInput v-model="searchTerm" icon="i-lucide-search" size="xl" variant="outline" placeholder="Search..." class="w-full"/>
 
-        <div v-if="results.length > 0">
+        <div v-if="results.length > 0" class="flex flex-col gap-4">
           <AuthorityCard 
-            v-for="result in results" 
+            v-for="result in results"
             :key="result.id"
             :authority="result"
           >
@@ -46,14 +46,17 @@
 <script lang="ts" setup>
 import { searchAuthorities } from '~/services/authority-service'
 import { requestPermission } from '~/services/permission-service';
+import AuthorityCard from '../cards/authority-card.vue'
 import ConfirmModal from './confirm-modal.vue'
 import type { Authority, User } from '~~/server/types';
+import { useAutoAnimate } from '@formkit/auto-animate/vue'
+
   const modal = useModal()
   const props = defineProps<{
     user: User
   }>()
 
-  
+  const [wrapperEl] = useAutoAnimate()
 
 
   const searchTerm = ref('')

@@ -7,4 +7,4 @@ export const requestPermission = async (userId: string, authorityId?: string, au
             authorityType
         }
     })
-} 
+}

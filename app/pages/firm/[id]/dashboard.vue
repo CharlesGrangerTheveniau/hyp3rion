@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-multiple-template-root -->
 <template>
-    <h1>Dashboard</h1>
+    <h1>Firm Dashboard</h1>
     
 </template>
 
@@ -13,11 +13,6 @@ definePageMeta({
 
 const user = useSupabaseUser()
 console.log(user.value)
-
-
-if (!user.value?.id) {
-  navigateTo('/login')
-}
 
 
 

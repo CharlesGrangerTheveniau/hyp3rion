@@ -4,28 +4,16 @@ import type { Entity } from "~~/server/api/entities/getEntities"
 import type { UserProfile } from "~~/server/api/users"
 
 export const getUser = async (userSession: any) => {
+    console.log(userSession)
     const user: User = await $fetch<User>('/api/users', {
         headers: {
             'X-User-Data': JSON.stringify(userSession)
         },
         method: 'GET'
     })
-
-    user.entities = await $fetch<Entity[]>('/api/entities/getEntities', {
-        headers: {
-            'X-User-Id': JSON.stringify(user.id)
-        }
-    })
-
-    user.documents = await $fetch<Document[]>('/api/documents/getDocuments', {
-        headers: {
-            'X-User-Id': JSON.stringify(user.id)
-        }
-    })
-    
-
     return user
 }
+
 export const getUserInfo = (user: User) => {
     const personEntity = user.entities.find((entity) => entity.type === 'PERSON')?.person as Person
 
