@@ -8,7 +8,10 @@ CREATE TYPE "EntityRole" AS ENUM ('CLIENT', 'DIRECTOR', 'SHAREHOLDER', 'INVESTOR
 CREATE TYPE "EntityType" AS ENUM ('PERSON', 'COMPANY');
 
 -- CreateEnum
-CREATE TYPE "FirmPermissionType" AS ENUM ('READ_ONLY', 'CREATE_CLIENT', 'CREATE_OPERATION', 'CREATE_DOCUMENT', 'DELETE_DOCUMENT', 'DELETE_OPERATION', 'DELETE_CLIENT');
+CREATE TYPE "FirmStatus" AS ENUM ('CERTIFIED', 'UNCERTIFIED');
+
+-- CreateEnum
+CREATE TYPE "PermissionType" AS ENUM ('READ_ONLY', 'ADMIN', 'DENIED', 'PENDING');
 
 -- CreateEnum
 CREATE TYPE "OperationType" AS ENUM ('CREATION', 'MODIFICATION', 'DELETION');
@@ -35,10 +38,12 @@ CREATE TABLE "Client" (
 CREATE TABLE "Entity" (
     "id" TEXT NOT NULL DEFAULT 'e_' || substr(md5(random()::text), 1, 10),
     "clientId" TEXT,
+    "firmId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "type" "EntityType" NOT NULL,
     "role" "EntityRole",
+    "someOtherField" TEXT,
 
     CONSTRAINT "Entity_pkey" PRIMARY KEY ("id")
 );
@@ -135,10 +140,12 @@ CREATE TABLE "User" (
     "firstName" TEXT,
     "lastName" TEXT,
     "fullName" TEXT,
-    "email" TEXT NOT NULL,
+    "email" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "connected" BOOLEAN NOT NULL DEFAULT false,
+    "avatar" TEXT,
+    "phone" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -149,33 +156,23 @@ CREATE TABLE "Firm" (
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "entityId" TEXT,
+    "status" "FirmStatus" NOT NULL DEFAULT 'UNCERTIFIED',
 
     CONSTRAINT "Firm_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "FirmPermission" (
+CREATE TABLE "Permission" (
     "id" TEXT NOT NULL DEFAULT 'fp_' || substr(md5(random()::text), 1, 10),
-    "firmId" TEXT NOT NULL,
+    "firmId" TEXT,
+    "clientId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "permission" "FirmPermissionType" NOT NULL,
+    "permission" "PermissionType" NOT NULL,
 
-    CONSTRAINT "FirmPermission_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ClientPermission" (
-    "id" TEXT NOT NULL DEFAULT 'cp_' || substr(md5(random()::text), 1, 10),
-    "clientId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-
-    CONSTRAINT "ClientPermission_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -183,6 +180,9 @@ CREATE UNIQUE INDEX "Client_entityId_key" ON "Client"("entityId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Entity_clientId_key" ON "Entity"("clientId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Entity_firmId_key" ON "Entity"("firmId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Person_entityId_key" ON "Person"("entityId");
@@ -195,6 +195,9 @@ CREATE UNIQUE INDEX "Company_siren_key" ON "Company"("siren");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Firm_entityId_key" ON "Firm"("entityId");
 
 -- AddForeignKey
 ALTER TABLE "Client" ADD CONSTRAINT "Client_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -224,13 +227,13 @@ ALTER TABLE "Signatory" ADD CONSTRAINT "Signatory_documentId_fkey" FOREIGN KEY (
 ALTER TABLE "Signatory" ADD CONSTRAINT "Signatory_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FirmPermission" ADD CONSTRAINT "FirmPermission_firmId_fkey" FOREIGN KEY ("firmId") REFERENCES "Firm"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Firm" ADD CONSTRAINT "Firm_entityId_fkey" FOREIGN KEY ("entityId") REFERENCES "Entity"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FirmPermission" ADD CONSTRAINT "FirmPermission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Permission" ADD CONSTRAINT "Permission_firmId_fkey" FOREIGN KEY ("firmId") REFERENCES "Firm"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ClientPermission" ADD CONSTRAINT "ClientPermission_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Permission" ADD CONSTRAINT "Permission_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ClientPermission" ADD CONSTRAINT "ClientPermission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Permission" ADD CONSTRAINT "Permission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

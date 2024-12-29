@@ -130,7 +130,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
-import { getUser, getUserInfo, updateUser } from '../services/user-service'
+import { getUser, getUserInfo, updateUser } from '~/services/user-service'
 import { getAddressForUser } from '~/services/address-service'
 import type { PappersCompany } from '~/services/pappers-service'
 const user = useSupabaseUser()

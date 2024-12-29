@@ -1,6 +1,9 @@
--- AlterEnum
-ALTER TYPE "PermissionType" ADD VALUE 'DENIED';
+/*
+  Warnings:
 
+  - You are about to drop the column `someOtherField` on the `Entity` table. All the data in the column will be lost.
+
+*/
 -- AlterTable
 ALTER TABLE "Address" ALTER COLUMN "id" SET DEFAULT 'adr_' || substr(md5(random()::text), 1, 10);
 
@@ -14,7 +17,8 @@ ALTER TABLE "Company" ALTER COLUMN "id" SET DEFAULT 'comp_' || substr(md5(random
 ALTER TABLE "Document" ALTER COLUMN "id" SET DEFAULT 'doc_' || substr(md5(random()::text), 1, 10);
 
 -- AlterTable
-ALTER TABLE "Entity" ALTER COLUMN "id" SET DEFAULT 'e_' || substr(md5(random()::text), 1, 10);
+ALTER TABLE "Entity" DROP COLUMN "someOtherField",
+ALTER COLUMN "id" SET DEFAULT 'e_' || substr(md5(random()::text), 1, 10);
 
 -- AlterTable
 ALTER TABLE "Firm" ALTER COLUMN "id" SET DEFAULT 'f_' || substr(md5(random()::text), 1, 10);
@@ -32,7 +36,4 @@ ALTER TABLE "Person" ALTER COLUMN "id" SET DEFAULT 'p_' || substr(md5(random()::
 ALTER TABLE "Signatory" ALTER COLUMN "id" SET DEFAULT 'sig_' || substr(md5(random()::text), 1, 10);
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "avatar" TEXT,
-ADD COLUMN     "phone" TEXT,
-ALTER COLUMN "id" SET DEFAULT 'u_' || substr(md5(random()::text), 1, 10),
-ALTER COLUMN "email" DROP NOT NULL;
+ALTER TABLE "User" ALTER COLUMN "id" SET DEFAULT 'u_' || substr(md5(random()::text), 1, 10);

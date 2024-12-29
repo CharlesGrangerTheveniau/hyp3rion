@@ -49,6 +49,11 @@ const emit = defineEmits<{
 const userStore = useUserStore()
 const client = useSupabaseClient()
 const colorMode = useColorMode()
+const route = useRoute()
+
+const firmId = route.path.split('/')[2]
+
+console.log(firmId)
 
 // ----------------
 // Computed Properties
@@ -87,7 +92,7 @@ const topLinks = [
         {
             label: 'Clients',
             icon: 'i-heroicons-document-text',
-            to: '/getting-started/installation',
+            to: `/firm/${firmId}/clients`,
             badge: 100,
         }, 
         { 

@@ -3,7 +3,7 @@
 <!-- Hero Section -->
       <div class="relative pt-[200px] px-6">
           <div class="max-w-[1220px] mx-auto text-center">
-              <h1 class="text-6xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Generate NDAs in Seconds</h1>
+              <h1 class="text-6xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">Generate in Seconds</h1>
       
               <p class="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
                   Stop wasting time with complex legal documents. Create professional NDAs instantly with our simple, secure platform.
