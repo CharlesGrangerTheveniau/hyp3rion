@@ -184,6 +184,7 @@
   
   const login = async (provider: Provider) => {
     console.log('logging in with', provider)
+    console.log(window.location.origin)
     await client.auth.signInWithOAuth({
       provider,
       options: {

@@ -14,7 +14,7 @@
             </div>
             <template #body>
                 <div class="flex flex-col justify-between h-full bg-white dark:bg-gray-900">
-                    <Sidebar type="mobile" :nav-fixed="isNavFixed"/>
+                    <AppSidebar type="mobile" :nav-fixed="isNavFixed"/>
                 </div>
             </template>
         </USlideover>
