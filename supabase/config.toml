@@ -16,8 +16,6 @@ extra_search_path = ["public", "extensions", "prisma"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
-# Change this to your dev domain
-api_url = "http://dev.th3mis.io"
 
 [api.tls]
 # Enable HTTPS endpoints locally using a self-signed certificate.
@@ -31,8 +29,6 @@ shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
 major_version = 15
-# Make sure your database is accessible from your dev domain
-host = "0.0.0.0"  # This allows external connections
 
 [db.pooler]
 enabled = false
@@ -65,7 +61,7 @@ enabled = true
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
-api_url = "http://dev.th3mis.io"
+api_url = "http://127.0.0.1"
 # OpenAI API Key to use for Supabase AI in the Supabase Studio.
 openai_api_key = "env(OPENAI_API_KEY)"
 
@@ -101,9 +97,9 @@ file_size_limit = "50MiB"
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://dev.th3mis.io"
+site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://dev.th3mis.io"]
+additional_redirect_urls = ["https://127.0.0.1:3000", "http://localhost:3000"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # If disabled, the refresh token will never expire.
@@ -237,7 +233,7 @@ enabled = false
 enabled = true
 client_id = "env(GOOGLE_CLIENT_ID)"
 secret = "env(GOOGLE_CLIENT_SECRET)"
-redirect_uri = "http://dev.th3mis.io/auth/callback"
+redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
 
 # Use Auth0 as a third-party provider alongside Supabase Auth.
 [auth.third_party.auth0]

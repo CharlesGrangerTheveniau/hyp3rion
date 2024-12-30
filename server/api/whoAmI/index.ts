@@ -28,10 +28,7 @@ export default defineEventHandler(async (event) => {
 
         const user = await prisma.user.findFirst({
             where: {
-                OR: [
-                    { email: userSession.email },
-                    { phone: userSession.phone }
-                ]
+                email: userSession.email
             },
             include: {
                 permissions: true,

@@ -4,10 +4,6 @@ export default defineNuxtConfig({
   colorMode: {
     preference: 'dark'
   },
-  devServer: {
-    host: 'dev.th3mis.io',
-    port: 3000
-  },
   modules: [
     "@nuxt/ui",
     "@nuxt/eslint",
@@ -21,7 +17,7 @@ export default defineNuxtConfig({
     /* redirect: false, */
     redirectOptions: {
       login: '/login',
-      callback: 'proces',
+      callback: '/confirm',
       exclude: ['/*'], // exclude all routes from middleware
     }
   },

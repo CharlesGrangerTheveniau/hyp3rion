@@ -21,6 +21,12 @@ enum DocumentStatus {
   REJECTED
 }
 
+enum SignatureStatus {
+  PENDING
+  SIGNED
+  REJECTED
+}
+
 model Client {
   id          String       @id @default(dbgenerated("'c_' || substr(md5(random()::text), 1, 10)"))
   entityId    String       @unique

@@ -5,7 +5,6 @@ import AvailablePermissionsModal from '~/components/modals/available-permissions
 import NoPermissionsModal from '~/components/modals/no-permissions-modal.vue'
 import { useUserStore } from '~/stores/userStore'
 import { type User, type Permissions, PermissionType } from '~~/server/types'
-import { User as SupabaseUser } from '@supabase/supabase-js'
 
 
 const userSession = useSupabaseUser()
@@ -73,6 +72,7 @@ const checkPendingPermissions = (permissions: Permissions | undefined) => {
 }
 
 onMounted(async () => {
+  console.log(userSession.value)
   if (userSession.value) {
     try {
       const { user, permissions } = await userStore.fetchUserAndPermissions(userSession.value)

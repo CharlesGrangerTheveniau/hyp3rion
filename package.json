@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "supabase:restart": "supabase stop && supabase start"
+    "supabase:restart": "supabase stop && supabase start",
+    "supabase:restart:dev": "supabase stop && supabase start && nuxt dev"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

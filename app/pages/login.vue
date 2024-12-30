@@ -3,188 +3,122 @@
       <NuxtLink to="/" class="back-btn">
         <Icon name="material-symbols:close" />
       </NuxtLink>
-  
-      <div class="auth-content">
+
+      <div v-if="emailSent" class="auth-content flex flex-col gap-6 items-center justify-center">
         <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
-          <h1>Welcome to <span class="highlight">BLOC-X</span></h1>
+          <h1><span class="highlight font-bold">Check your inbox</span></h1>
+          <p class="subtitle">
+            We have sent you a secure code to your email. Please enter the code to authenticate your account.
+          </p>
+        </div>
+
+        <UPinInput v-model="pin" size="xl" color="neutral" type="number" mask otp length="6" />
+
+      </div>
+  
+      <div v-else class="auth-content flex flex-col gap-6">
+        <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
+          <h1>Welcome to <span class="highlight font-bold">Th3mis</span></h1>
           <p class="subtitle">
             Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.
           </p>
         </div>
         
-        <UButtonGroup class="flex w-full gap-2">
-          <USelectMenu
-            v-model="phoneCode"
-            size="xl"
-            :items="codes"
-            value-key="value"
-            label-key="label"
-            filter-fields="['label', 'value']"
-            :search-input="{ icon: 'i-lucide-search' }"
-            class="w-32"
-          >
-            <template #leading="{ modelValue }">
-              <UIcon 
-                v-if="modelValue" 
-                :name="`twemoji:flag-${modelValue.label}`" 
-                class="w-5 h-5"
-              />
-              <UIcon 
-                v-else 
-                name="i-lucide-earth" 
-                class="w-5 h-5"
+        <UInput
+            color="neutral"
+            v-model="email" 
+            placeholder="Enter your email" 
+            size="xl" 
+            class="w-full">
+
+            <template #trailing>
+              <UButton
+                :loading="loading"
+                color="primary"
+                variant="link"
+                size="xl"
+                icon="i-solar:round-alt-arrow-right-outline"
+                :disabled="!isValidEmail"
+                :ui="{
+                    base: 'disabled:opacity-20'
+                }"
+                @click="loginWithEmail()"
               />
             </template>
-            
-            <template #item="{ item }">
-              <div class="flex items-center gap-2">
-                <UIcon :name="`twemoji:flag-${item.label}`" class="w-5 h-5" />
-                <span>{{ item.value }}</span>
-              </div>
-            </template>
-          </USelectMenu>
-          <UInput
-            v-model="phone"
-            size="xl"
-            placeholder="Enter your phone number"
-            class="flex-1"
-          />
-          <UButton size="xl" class="shrink-0" @click="phoneLogin()">
-            <UIcon name="i-lucide-send"/>
-          </UButton>
-            
+        </UInput>
           
-        </UButtonGroup>
+        
   
-        <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
-          <button @click="login('google')" class="google-btn">
-            <img src="/google.png" alt="Google" >
-            Signup with Google
-          </button>
-  
-          <p class="terms">
-            By signing up, you agree to our <a href="#">Terms of Service</a>.
-          </p>
+        <div class="blur-group flex flex-row gap-3 justify-center items-center" :class="{ 'blur-effect': isInputFocused }">
+          <UButton color="neutral" variant="link" size="xl" class="flex flex-row gap-3 justify-center items-center p-4" @click="login('google')">
+            <img :src="`/google.png`" alt="Google" class="h-7 w-7">
+              Login with Google
+          </UButton>
         </div>
+        
+        
       </div>
     </div>
   </template>
   
-  <script lang="ts" setup>
+<script lang="ts" setup>
   import type { Provider } from '@supabase/supabase-js'
+  const router = useRouter()
 
-  interface PhoneCode {
-    label: string
-    value: string
-  }
+  defineShortcuts({
+    enter: {
+      usingInput: true,
+      handler: () => {
+        if(isValidEmail.value) {
+            loginWithEmail()
+        }
+      }
+    }
+  })
 
-  const phone = ref('')
-  const phoneCode = ref<PhoneCode>({ label: 'france', value: '+33' })
-
-  
-
-  const codes = ref([
-    { label: 'afghanistan', value: '+93' },
-    { label: 'albania', value: '+355' },
-    { label: 'algeria', value: '+213' },
-    { label: 'andorra', value: '+376' },
-    { label: 'angola', value: '+244' },
-    { label: 'argentina', value: '+54' },
-    { label: 'armenia', value: '+374' },
-    { label: 'australia', value: '+61' },
-    { label: 'austria', value: '+43' },
-    { label: 'azerbaijan', value: '+994' },
-    { label: 'bahrain', value: '+973' },
-    { label: 'bangladesh', value: '+880' },
-    { label: 'belarus', value: '+375' },
-    { label: 'belgium', value: '+32' },
-    { label: 'brazil', value: '+55' },
-    { label: 'bulgaria', value: '+359' },
-    { label: 'canada', value: '+1' },
-    { label: 'china', value: '+86' },
-    { label: 'colombia', value: '+57' },
-    { label: 'croatia', value: '+385' },
-    { label: 'cyprus', value: '+357' },
-    { label: 'czechia', value: '+420' },
-    { label: 'denmark', value: '+45' },
-    { label: 'egypt', value: '+20' },
-    { label: 'estonia', value: '+372' },
-    { label: 'finland', value: '+358' },
-    { label: 'france', value: '+33' },
-    { label: 'germany', value: '+49' },
-    { label: 'greece', value: '+30' },
-    { label: 'hong-kong-sar-china', value: '+852' },
-    { label: 'hungary', value: '+36' },
-    { label: 'iceland', value: '+354' },
-    { label: 'india', value: '+91' },
-    { label: 'indonesia', value: '+62' },
-    { label: 'iran', value: '+98' },
-    { label: 'iraq', value: '+964' },
-    { label: 'ireland', value: '+353' },
-    { label: 'israel', value: '+972' },
-    { label: 'italy', value: '+39' },
-    { label: 'japan', value: '+81' },
-    { label: 'jordan', value: '+962' },
-    { label: 'kazakhstan', value: '+7' },
-    { label: 'kenya', value: '+254' },
-    { label: 'kuwait', value: '+965' },
-    { label: 'latvia', value: '+371' },
-    { label: 'lebanon', value: '+961' },
-    { label: 'lithuania', value: '+370' },
-    { label: 'luxembourg', value: '+352' },
-    { label: 'malaysia', value: '+60' },
-    { label: 'malta', value: '+356' },
-    { label: 'mexico', value: '+52' },
-    { label: 'monaco', value: '+377' },
-    { label: 'morocco', value: '+212' },
-    { label: 'netherlands', value: '+31' },
-    { label: 'new-zealand', value: '+64' },
-    { label: 'norway', value: '+47' },
-    { label: 'pakistan', value: '+92' },
-    { label: 'philippines', value: '+63' },
-    { label: 'poland', value: '+48' },
-    { label: 'portugal', value: '+351' },
-    { label: 'qatar', value: '+974' },
-    { label: 'romania', value: '+40' },
-    { label: 'russia', value: '+7' },
-    { label: 'saudi-arabia', value: '+966' },
-    { label: 'singapore', value: '+65' },
-    { label: 'slovakia', value: '+421' },
-    { label: 'slovenia', value: '+386' },
-    { label: 'south-africa', value: '+27' },
-    { label: 'south-korea', value: '+82' },
-    { label: 'spain', value: '+34' },
-    { label: 'sweden', value: '+46' },
-    { label: 'switzerland', value: '+41' },
-    { label: 'taiwan', value: '+886' },
-    { label: 'thailand', value: '+66' },
-    { label: 'turkey', value: '+90' },
-    { label: 'ukraine', value: '+380' },
-    { label: 'united-arab-emirates', value: '+971' },
-    { label: 'united-kingdom', value: '+44' },
-    { label: 'united-states', value: '+1' },
-    { label: 'vietnam', value: '+84' }
-  ])
-
+  const email = ref('')
+  const pin = ref([])
+  const emailSent = ref(false)
+  const loading = ref(false)
   const isInputFocused = ref(false)
+  const toast = useToast()
 
-  
-  watch(phone, (newVal) => {
-    if (newVal.length > 0) {
+  watch(email, (newVal) => {
+    if(newVal.length > 0) {
       isInputFocused.value = true
-      console.log('input focused')
     } else {
       isInputFocused.value = false
-      console.log('input not focused')
+    }
+  })
+
+  watch(pin, async (newPin) => {
+    if (newPin.length > 0) {
+      isInputFocused.value = true
+    } else {
+      isInputFocused.value = false
+    }
+
+    if(newPin.length === 6) {
+      const tokenInput = newPin.join('')
+      const { error } = await client.auth.verifyOtp({
+        email: email.value,
+        token: tokenInput,
+        type: 'email'
+      })
+      if(error) {
+        console.error('Error during authentication:', error)
+        router.push('/login')
+      }
+      console.log('tokenInput', tokenInput)
+      console.log('submit')
+
+      router.push('/auth/callback')
     }
   })
   
   const client = useSupabaseClient()
-  
-  
+
   const login = async (provider: Provider) => {
-    console.log('logging in with', provider)
-    console.log(window.location.origin)
     await client.auth.signInWithOAuth({
       provider,
       options: {
@@ -193,18 +127,46 @@
     })
   }
 
-  const phoneLogin = async () => {
-    const phoneNumber = phoneCode.value.value + phone.value
-    console.log(phoneNumber)
-    const send = await client.auth.signInWithOtp({
-      phone: phoneNumber,
-    })
-    console.log(send)
+  const loginWithEmail = async () => {
+    loading.value = true
+    try {
+      const { data, error } = await client.auth.signInWithOtp({
+        email: email.value,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        }
+      })
+      
+      if (error) throw error
+
+      
+      toast.add({
+        title: 'Check your email',
+        description: 'We sent you a magic link to sign in',
+        color: 'success'
+      })
+
+      emailSent.value = true      
+    } catch (error) {
+      toast.add({
+        title: 'Error',
+        description: error.message,
+        color: 'error'
+      })
+    } finally {
+      loading.value = false
+      isInputFocused.value = false
+    }
   }
   
-  </script>
+  const isValidEmail = computed(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email.value)
+  })
   
-  <style scoped>
+</script>
+  
+<style scoped>
   .auth-container {
     min-height: 100vh;
     background-color: #000;
@@ -212,6 +174,11 @@
     align-items: center;
     justify-content: center;
     color: white;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 2rem;
   }
   
   .auth-content {
@@ -234,12 +201,18 @@
   }
   
   .highlight {
-    color: #ffd700;
+    background-color: #f3ec78;
+    background-image: linear-gradient(45deg, var(--ui-color-primary-500), var(--ui-color-primary-100));
+    background-size: 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent; 
+    -moz-text-fill-color: transparent;
   }
   
   .subtitle {
     color: #999;
-    margin-bottom: 2rem;
   }
   
   .input-group {
@@ -321,4 +294,4 @@
   .back-btn:hover {
     opacity: 1;
   }
-  </style>
+</style>
