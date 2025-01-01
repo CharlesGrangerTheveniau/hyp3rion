@@ -4,65 +4,68 @@
         <Icon name="material-symbols:close" />
       </NuxtLink>
 
-      <div v-if="emailSent" class="auth-content flex flex-col gap-6 items-center justify-center">
-        <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
-          <h1><span class="highlight font-bold">Check your inbox</span></h1>
-          <p class="subtitle">
-            We have sent you a secure code to your email. Please enter the code to authenticate your account.
-          </p>
+      <Transition name="fade" mode="out-in">
+        <div v-if="emailSent" key="email-sent" class="auth-content flex flex-col gap-6 items-center justify-center">
+          <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
+            <h1><span class="font-bold gradient-text-primary">Check your inbox</span></h1>
+            <p class="subtitle">
+              We have sent you a secure code to your email. Please enter the code to authenticate your account.
+            </p>
+          </div>
+
+          <UPinInput v-model="pin" size="xl" color="neutral" type="number" mask otp length="6" />
+
         </div>
-
-        <UPinInput v-model="pin" size="xl" color="neutral" type="number" mask otp length="6" />
-
-      </div>
-  
-      <div v-else class="auth-content flex flex-col gap-6">
-        <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
-          <h1>Welcome to <span class="highlight font-bold">Th3mis</span></h1>
-          <p class="subtitle">
-            Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.
-          </p>
-        </div>
-        
-        <UInput
-            color="neutral"
-            v-model="email" 
-            placeholder="Enter your email" 
-            size="xl" 
-            class="w-full">
-
-            <template #trailing>
-              <UButton
-                :loading="loading"
-                color="primary"
-                variant="link"
-                size="xl"
-                icon="i-solar:round-alt-arrow-right-outline"
-                :disabled="!isValidEmail"
-                :ui="{
-                    base: 'disabled:opacity-20'
-                }"
-                @click="loginWithEmail()"
-              />
-            </template>
-        </UInput>
+        <div v-else key="login-form" class="auth-content flex flex-col gap-6">
+          <div class="blur-group" :class="{ 'blur-effect': isInputFocused }">
+            <h1>Welcome to <span class="gradient-text-primary font-bold">th3mis</span></h1>
+            <p class="text-[var(--ui-text-dimmed)]">
+              Thank you for being an early adopter. To start enjoying the benefits, let's set up your account.
+            </p>
+          </div>
           
-        
-  
-        <div class="blur-group flex flex-row gap-3 justify-center items-center" :class="{ 'blur-effect': isInputFocused }">
-          <UButton color="neutral" variant="link" size="xl" class="flex flex-row gap-3 justify-center items-center p-4" @click="login('google')">
-            <img :src="`/google.png`" alt="Google" class="h-7 w-7">
-              Login with Google
-          </UButton>
+          <UInput
+              color="neutral"
+              v-model="email" 
+              placeholder="Enter your email" 
+              size="xl" 
+              class="w-full">
+
+              <template #trailing>
+                <UButton
+                  :loading="loading"
+                  color="primary"
+                  variant="link"
+                  size="xl"
+                  icon="i-solar:round-alt-arrow-right-outline"
+                  :disabled="!isValidEmail"
+                  :ui="{
+                      base: 'disabled:opacity-20'
+                  }"
+                  @click="loginWithEmail()"
+                />
+              </template>
+          </UInput>
+            
+          
+          <Divider text="or" class="blur-group" :class="{ 'blur-effect': isInputFocused }"/>
+
+          <div class="blur-group flex flex-row gap-3 justify-center items-center" :class="{ 'blur-effect': isInputFocused }">
+            <UButton color="neutral" variant="link" size="xl" class="flex flex-row gap-3 justify-center items-center pb-4 pt-0 p-x-4" @click="login('google')">
+              <img :src="`/google.png`" alt="Google" class="h-7 w-7">
+                Login with Google
+            </UButton>
+          </div>
+          
+          
         </div>
-        
-        
-      </div>
+      </Transition>
     </div>
   </template>
   
 <script lang="ts" setup>
   import type { Provider } from '@supabase/supabase-js'
+  import Divider from '~/components/divider.vue'
   const router = useRouter()
 
   defineShortcuts({
@@ -143,7 +146,8 @@
       toast.add({
         title: 'Check your email',
         description: 'We sent you a magic link to sign in',
-        color: 'success'
+        color: 'success',
+        duration: 6000
       })
 
       emailSent.value = true      
@@ -169,7 +173,6 @@
 <style scoped>
   .auth-container {
     min-height: 100vh;
-    background-color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,24 +194,13 @@
     transition: filter 0.4s ease;
     
     &.blur-effect {
-      filter: blur(8px);
+      filter: blur(4px);
     }
   }
   
   h1 {
     font-size: 2rem;
     margin-bottom: 1rem;
-  }
-  
-  .highlight {
-    background-color: #f3ec78;
-    background-image: linear-gradient(45deg, var(--ui-color-primary-500), var(--ui-color-primary-100));
-    background-size: 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-    -webkit-text-fill-color: transparent; 
-    -moz-text-fill-color: transparent;
   }
   
   .subtitle {
@@ -293,5 +285,15 @@
   
   .back-btn:hover {
     opacity: 1;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>

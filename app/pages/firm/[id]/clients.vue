@@ -103,7 +103,7 @@
     import { searchCompany, type PappersCompany } from '~/services/pappers-service'
     import AuthorityCard from '~/components/cards/authority-card.vue'
     definePageMeta({
-        layout: 'dashboard'
+        layout: 'firm-dashboard'
     })
 
     const isDrawerOpen = ref(false)

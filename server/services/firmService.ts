@@ -1,5 +1,6 @@
-import { EntityType, PrismaClient } from '@prisma/client'
-import type{ CompanyMetadata, Firm, FirmMetadata, PersonMetadata } from '../types'
+import { PrismaClient } from '@prisma/client'
+import type { CompanyMetadata, Firm, FirmMetadata, PersonMetadata } from '../types'
+import { EntityType } from '../types'
 import { EntityService } from './entityService'
 
 

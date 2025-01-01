@@ -1,4 +1,3 @@
-import type { EntityType } from "@prisma/client"
 
 export interface Firm {
     id: string
@@ -117,6 +116,11 @@ export interface Authority {
     company: CompanyMetadata
   }
 
-  export interface AuthorityWithPermissionForUser extends Authority {
-    permissionForUser: PermissionType
-  }
+export interface AuthorityWithPermissionForUser extends Authority {
+permissionForUser: PermissionType
+}
+
+export enum EntityType {
+    PERSON = 'PERSON',
+    COMPANY = 'COMPANY'
+}

@@ -1,6 +1,6 @@
-import { PrismaClient, EntityType } from "@prisma/client"
+import { PrismaClient } from "@prisma/client"
 import type { EntityMetadata, CompanyMetadata, PersonMetadata } from "../types"
-
+import { EntityType } from "../types"
 export class EntityService {
     private static prisma = new PrismaClient()
 

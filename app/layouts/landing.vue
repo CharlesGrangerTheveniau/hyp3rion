@@ -80,6 +80,8 @@ const signOut = async () => {
 await supabase.auth.signOut()
 navigateTo('/login')
 }
+
+console.log('hey')
 </script>
 
 <style>

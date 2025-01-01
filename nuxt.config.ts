@@ -4,6 +4,15 @@ export default defineNuxtConfig({
   colorMode: {
     preference: 'dark'
   },
+  components: [
+    {
+      path: '~/app/components',
+      pathPrefix: false,
+    },
+  ],
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
   modules: [
     "@nuxt/ui",
     "@nuxt/eslint",

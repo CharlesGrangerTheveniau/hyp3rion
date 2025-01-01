@@ -235,6 +235,12 @@ client_id = "env(GOOGLE_CLIENT_ID)"
 secret = "env(GOOGLE_CLIENT_SECRET)"
 redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
 
+# [auth.external.slack]
+# enabled = true
+# client_id = "env(SLACK_CLIENT_ID)"
+# secret = "env(SLACK_CLIENT_SECRET)"
+# redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
+
 # Use Auth0 as a third-party provider alongside Supabase Auth.
 [auth.third_party.auth0]
 enabled = false

@@ -15,7 +15,7 @@
                 <UButton icon="i-heroicons-bars-3" color="primary" variant="ghost" />
             </div>
             <template #body>
-                <div class="flex flex-col justify-between h-full bg-white dark:bg-gray-900">
+                <div class="flex flex-col justify-between h-full bg-white bg-[var(--ui-bg)]">
                     <AppSidebar type="mobile" :nav-fixed="isNavFixed"/>
                 </div>
             </template>
@@ -32,7 +32,7 @@
       >
         <div 
             v-show="isDesktopMenuOpen || isNavFixed" 
-            class="fixed hidden lg:flex flex-col justify-between h-screen w-[25%] bg-white dark:bg-gray-900 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)] p-8 z-50 transition-all duration-300"
+            class="fixed hidden lg:flex flex-col justify-between h-screen w-[25%] bg-[color:var(--color-white)]/10 dark:bg-[color:var(--ui-color-neutral-900)]/90 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)] p-8 z-50 transition-all duration-300"
             @mouseleave="isNavFixed ? null : isDesktopMenuOpen = false">
             
             <AppSidebar 
@@ -45,12 +45,12 @@
       <!-- Hover trigger area -->
       <div 
         v-if="!isNavFixed" 
-        class="hidden lg:block fixed left-0 h-screen w-8 z-40"
+        class="hidden lg:block fixed left-0 h-screen w-8 z-40 bg-[var(--ui-bg)]"
         @mouseenter="isDesktopMenuOpen = true"/>
   
       <!-- Main content -->
       <main 
-        class="min-h-screen w-[100%] transition-all duration-300" 
+        class="min-h-screen w-[100%] transition-all duration-300 bg-[var(--ui-bg)]" 
         :class="[
             'mt-[60px] p-4 lg:mt-0 lg:p-8',
             (isDesktopMenuOpen || isNavFixed.value) ? 'lg:ml-[25%]' : 'lg:ml-8'
