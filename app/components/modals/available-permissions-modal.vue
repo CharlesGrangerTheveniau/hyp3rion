@@ -68,6 +68,8 @@ const headerMessage = computed(() => {
 })
 
 async function connectUser(permission: AuthorityWithPermissionForUser) {
+  
+  navigateTo(`/${permission.type}/${permission.id}/dashboard`)
   await $fetch(`/api/users`, {
     method: 'PATCH',
     body: {
@@ -77,7 +79,6 @@ async function connectUser(permission: AuthorityWithPermissionForUser) {
       'X-User-Id': JSON.stringify(props.user.id)
     }
   })
-  navigateTo(`/${permission.id}`)
   modal.close()
 }
 </script>

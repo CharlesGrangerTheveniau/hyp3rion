@@ -146,7 +146,7 @@
       toast.add({
         title: 'Check your email',
         description: 'We sent you a magic link to sign in',
-        color: 'success',
+       color: 'primary',
         duration: 6000
       })
 

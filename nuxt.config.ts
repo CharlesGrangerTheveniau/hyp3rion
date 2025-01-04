@@ -1,8 +1,17 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+
+    timeline: {
+      enabled: true
+    }
+  },
+  
+  
   colorMode: {
-    preference: 'dark'
+    preference: 'system',
+    fallback: 'light',
   },
   components: [
     {
@@ -11,7 +20,12 @@ export default defineNuxtConfig({
     },
   ],
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' }
+    pageTransition: { name: 'page', mode: 'out-in' },
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/3-temp.png' }
+      ]
+    }
   },
   modules: [
     "@nuxt/ui",
@@ -33,6 +47,12 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4
   },
-
+  runtimeConfig: {
+    public: {
+      stripePkKey: process.env.STRIPE_PK_KEY
+    }
+  },
   compatibilityDate: "2024-11-27"
 })
+
+

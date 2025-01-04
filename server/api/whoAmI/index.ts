@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
         }
 
         // Log the user session to see what we're getting in production
-        console.log('User Session:', userSession)
 
         const user = await prisma.user.findFirst({
             where: {

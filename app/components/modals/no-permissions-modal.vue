@@ -73,19 +73,17 @@ import { useAutoAnimate } from '@formkit/auto-animate/vue'
   })
 
   const requestPermissions = async (authority: Authority) => {
-    console.log('requesting permissions for', authority, props.user)
     const request = await requestPermission(props.user.id, authority.id, authority.type as "firm" | "client")
-
-    console.log('request', request)
+    
     showConfirm(authority.name)
   }
 
   const createFirm = async () => {
-    console.log('TO DO : onboarding firm')
+    modal.close()
+    navigateTo('/firm/create')
   }
 
   const showConfirm = (name: string) => {
-    console.log('showing no permissions')
     modal.open(ConfirmModal, {
       label: `The request has been sent to ${name}`,
       preventClose: true

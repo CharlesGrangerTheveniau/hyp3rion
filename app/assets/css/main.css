@@ -3,6 +3,7 @@
 
 @theme {
   --font-sans: "IBM Plex Sans", serif;
+  --ui-bg-dark: rgb(19, 20, 25);
 }
 
 body {

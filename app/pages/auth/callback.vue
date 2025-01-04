@@ -90,7 +90,7 @@ onMounted(async () => {
           if (firstValidFirmPermission) {
             router.push(`/firm/${firstValidFirmPermission.id}/dashboard`)
           } else {
-            router.push(`/client/${findFirstValidClientPermission(permissions)?.id}`)
+            router.push(`/client/${findFirstValidClientPermission(permissions)?.id}/dashboard`)
           }
         } else if (hasPendingPermissions) {
           // No valid permissions, show modal

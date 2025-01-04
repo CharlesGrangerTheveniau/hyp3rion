@@ -9,17 +9,18 @@
             'content': 'h-[40px]'
         }"
         >
-        <UButton
-            :icon="isDark ? 'i-heroicons-moon' : 'i-heroicons-sun'" 
-            variant="ghost"
+        <ClientOnly v-if="!colorMode?.forced">
+            <UButton
+            :icon="isDark ? 'i-lucide-moon' : 'i-lucide-sun'"
             color="neutral"
-            title="Toggle theme"
-            size="lg"
-            :ui="{
-                leadingIcon: 'size-6 text-neutral-500'
-            }"
+            variant="ghost"
             @click="isDark = !isDark"
-        />
+            />
+
+            <template #fallback>
+            <div class="size-8" />
+            </template>
+        </ClientOnly>
     </UTooltip>
 </template>
 
@@ -27,11 +28,6 @@
 
     const colorMode = useColorMode()
 
-    defineShortcuts({
-        l: () => {
-            isDark.value = !isDark.value
-        }
-    })
 
     // ----------------
     // Computed Properties

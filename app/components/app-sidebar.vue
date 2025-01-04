@@ -53,8 +53,6 @@ const route = useRoute()
 
 const firmId = route.path.split('/')[2]
 
-console.log(firmId)
-
 defineShortcuts({
     l: () => {
         isDark.value = !isDark.value

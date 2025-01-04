@@ -20,11 +20,16 @@
 <style>
   .page-enter-active,
   .page-leave-active {
-    transition: all 0.4s;
+    transition: all 0.3s cubic-bezier(0.3, 0, 0.3, 1);
+    transform-style: preserve-3d;
+    perspective: 1000px;
   }
-  .page-enter-from,
+  .page-enter-from {
+    opacity: 0;
+    transform: rotateX(10deg) translateZ(-100px);
+  }
   .page-leave-to {
     opacity: 0;
-    filter: blur(1rem);
+    transform: rotateX(-10deg) translateZ(-100px);
   }
 </style>

@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
             .filter(permission => permission.firm !== null)
             .map(async permission => {
                 const firm = permission.firm
-                return firm ? { permissionForUser: permission.permission, ...await firmService.buildFirm(firm) } : null
+                return firm ? { type: 'firm',permissionForUser: permission.permission, ...await firmService.buildFirm(firm) } : null
             })
     )
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
             .filter(permission => permission.client !== null)
             .map(async permission => {
                 const client = permission.client
-                return client ? { permissionForUser: permission.permission, ...await clientService.buildClient(client) } : null
+                return client ? { type: 'client',permissionForUser: permission.permission, ...await clientService.buildClient(client) } : null
             })
     )
 
