@@ -84,7 +84,6 @@
     open: boolean
   }>()
 
-  console.log(props.open)
 
   watch(props.open, (newVal) => {
     isOpen.value = newVal

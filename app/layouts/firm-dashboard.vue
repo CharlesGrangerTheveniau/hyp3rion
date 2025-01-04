@@ -25,11 +25,15 @@
 
       <!-- parent div -->
 
-      <div class="relative flex flex-col justify-between items-center h-screen w-[70px] py-5 z-10 bg-[color:var(--color-white)]/10 dark:bg-[color:var(--ui-color-neutral-900)]/90 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)]">
+      <div class="fixed flex flex-col justify-between items-center h-screen w-[51px] py-5 z-10 bg-[color:var(--color-white)]/10 dark:bg-[color:var(--ui-color-neutral-900)]/90 shadow-[3px_0_10px_-2px_rgba(0,0,0,0.3)]">
 
         <div class="absolute top-0 right-0 bottom-0 w-[1px] h-screen bg-radial-white"/>
 
-        <UButton icon="i-heroicons-home" color="neutral" variant="ghost" size="xl"/>
+        <NuxtLink to="/">
+          <img src="/3-temp.png" alt="th3mis logo" class="w-[30px] h-[30px]">
+        </NuxtLink>
+
+        <!-- <UButton icon="i-heroicons-home" color="neutral" variant="ghost" size="xl" @click="navigateTo('/')"/> -->
 
         <div class="flex flex-col relative w-full text-center">
             <div class="relative">
@@ -38,8 +42,9 @@
                   :key="tab.to" 
                   class="block flex flex-col justify-center items-center h-[50px] w-full mb-[10px] relative cursor-pointer"
                   @click="goTo(tab.to)">
+                  
                     
-                  <div class="flex items-center justify-center w-10 h-10 rounded-xl transition-all hover:bg-[var(--ui-bg-elevated)] hover:scale-120">
+                  <div class="flex items-center justify-center w-10 h-10 rounded-xl transition-all hover:bg-[var(--ui-bg-elevated)] hover:scale-100">
                     <UTooltip 
                       :text="tab.to.toUpperCase()" 
                       :kbds="tab.kbds" 
@@ -53,7 +58,7 @@
                       <UIcon 
                         :name="tab.icon" 
                         :class="[
-                          'size-6', 
+                          'size-5', 
                           isActive(tab.to) ? 'text-[var(--ui-primary)]' : 'text-[var(--ui-color-neutral-500)]'
                         ]"
                       />
@@ -73,7 +78,7 @@
 
         <div class="flex flex-col gap-2">
 
-          <ThemeSwitch />
+          <ThemeSwitch @click="isDark = !isDark"/>
           <span class="block flex flex-col justify-center items-center h-[50px] w-full mb-[10px] relative cursor-pointer" @click="logout()">
             <div class="flex items-center justify-center w-10 h-10 rounded-xl transition-all hover:bg-[var(--ui-color-primary-900)]/30 hover:scale-110">
               <UIcon name="i-majesticons:logout-half-circle-line" class="size-6 text-neutral-500" />
@@ -87,12 +92,13 @@
       
   
       <!-- Main content -->
-      <main 
-        class="min-h-screen w-[100%] duration-300 bg-[var(--ui-bg)]">
-        <div class="w-full max-w-[1338px] mx-auto py-[0px] px-[74px] h-full overflow-y-scroll scrollbar-none">
-          <slot />
-        </div>
-      </main>
+        <main 
+          v-show="$route.path"
+          class="min-h-screen w-[100%] duration-300 bg-[var(--ui-bg)]">
+          <div class="w-full max-w-[1338px] mx-auto py-[0px] px-[74px] h-full overflow-y-scroll scrollbar-none">
+              <slot />
+          </div>
+        </main>
     </div>
   </template>
   
@@ -100,31 +106,36 @@
   import AppSidebar from '~/components/app-sidebar.vue'
   import ThemeSwitch from '~/components/theme-switch.vue'
   import { SpeedInsights } from '@vercel/speed-insights/vue';
+import { firmRoutes, type SidebarRoute } from './navigations';
   const userSession = useSupabaseUser()
   const client = useSupabaseClient()
-  if (!userSession.value) {
-    navigateTo('/login')
-  }
+
+  const colorMode = useColorMode()
+
+   
+
+    // ----------------
+    // Computed Properties
+    // ----------------
+    /**
+     * Controls the dark/light theme toggle
+     */
+    const isDark = computed({
+    get() {
+      return colorMode.value === 'dark'
+    },
+    set() {
+      colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+    }
+  })
+
+  console.log(colorMode.value)
 
   const userStore = useUserStore()
   const route = useRoute()
 
-  export interface SidebarRoute {
-    to: string
-    icon: string
-    kbds: string[]
-  }
-
-  const routes: SidebarRoute[] = [
-    { to: 'dashboard', icon: 'solar:home-2-outline', kbds: ['meta', 'H'] },
-    { to: 'clients', icon: 'solar:buildings-2-linear', kbds: ['meta', 'C'] },
-    { to: 'operations', icon: 'solar:database-outline', kbds: ['meta', 'O'] },
-    { to: 'documents', icon: 'solar:documents-linear', kbds: ['meta', 'D'] },
-    { to: 'content', icon: 'solar:book-minimalistic-outline', kbds: ['meta', 'B'] },
-    { to: 'team', icon: 'solar:users-group-rounded-line-duotone', kbds: ['meta', 'T'] },
-    { to: 'preferences', icon: 'solar:settings-minimalistic-linear', kbds: ['meta', 'P'] },
-  ]
-
+  const routes = firmRoutes
+  
   defineShortcuts({
       'meta_h': () => {
         goTo('dashboard')
@@ -135,18 +146,15 @@
       'meta_o': () => {
         goTo('operations')
       },
-      'meta_d': () => {
-        goTo('documents')
-      },
       'meta_b': () => {
         goTo('content')
-      },
-      'meta_t': () => {
-        goTo('team')
       },
       'meta_p': () => {
         goTo('preferences')
       },
+      'l': () => {
+        isDark.value = !isDark.value
+      }
   })
 
   const logout = async () => {
@@ -154,23 +162,21 @@
     navigateTo('/login')
   }
 
-  const goTo = (to: string) => {
+  const goTo = async (to: string) => {
     const route = useRoute()
-    // Extract firmId from current path
-    const firmId = route.path.split('/')[2]
+    const firmId = route.params.id
 
-    console.log(firmId)
-
-    if (firmId && firmId.startsWith('f_')) {
-      const newPath = firmId ? `/firm/${firmId}/${to}` : `/${to}`
-      navigateTo(newPath)
+    if (firmId && to) {
+      const newPath = `/firm/${firmId}/${to}`
+      await navigateTo(newPath)
     } else {
-      navigateTo('/')
+      await navigateTo('/')
     }
   }
 
   const isActive = (to: string) => {
-    return route.path.includes(to)
+
+    return route.path.split('/')[3] === to
   }
   
   // Menu state
@@ -185,6 +191,8 @@
       if (!hasPermission) {
         navigateTo('/auth/callback')
       }
+    } else {
+      navigateTo('/login')
     }
   })
 

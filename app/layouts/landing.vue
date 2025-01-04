@@ -3,12 +3,13 @@
     <div class="nav-bar">
         <!-- Left Side -->
       <div class="flex items-center gap-6">
-        <div class="text-[32px] text-gray-800">🔥</div>
+        <div class="text-[32px] text-gray-800">
+          <img src="/3-temp.png" alt="th3mis logo" class="w-[50px] h-[50px]">
+        </div>
         
         <div class="flex items-center gap-4">
           <div class="nav-item">
             <span>Features</span>
-            <UBadge class="ml-2" label="New" />
           </div>
           <div class="nav-item">
             <span>Pricing</span>

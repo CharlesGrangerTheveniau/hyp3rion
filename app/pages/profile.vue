@@ -202,7 +202,7 @@ async function saveChanges() {
     toast.add({
       title: 'Profile updated',
       description: 'Your profile has been successfully updated',
-      color: 'success'
+     color: 'primary'
     })
   } catch (error) {
     console.error('Error saving profile:', error)

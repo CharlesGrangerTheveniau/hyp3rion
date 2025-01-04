@@ -2,13 +2,14 @@
 // https://api.pappers.fr/v2/
 // 883844276
 
-export const searchCompany = async (input: string) => {
+export const searchCompany = async (input: string, length: number) => {
     const response = await $fetch<PappersMetadata>(
-        `https://api.pappers.fr/v3/suggestions-frontend?q=${input}&longueur=5&cibles=nom_entreprise,siren`
+        `https://api.pappers.fr/v3/suggestions-frontend?q=${input}&longueur=${length}&cibles=nom_entreprise,siren`
     )
 
     console.log(response)
     const companies = response.entreprises?.map(company => buildCompanySuggestion(company)) || []
+
 
     return companies
 }
@@ -30,6 +31,7 @@ export interface PappersCompany {
     name: string
     siren: string
     type: string
+    naf: string
     partialAddress: {
         zip: string
         city: string
@@ -42,6 +44,7 @@ const buildCompanySuggestion = (company: any): PappersCompany => {
         name: company.nom_entreprise,
         siren: company.siren_formate,
         type: company.forme_juridique,
+        naf: company.code_naf,
         partialAddress: {
             zip: company.siege.code_postal,
             city: company.siege.ville,

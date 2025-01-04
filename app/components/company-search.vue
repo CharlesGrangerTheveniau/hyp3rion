@@ -40,14 +40,13 @@
 
     watch(() => state.name, async (newValue) => {
         if (newValue.length > 3) {
-            console.log('searching')
             const companiesSearch = await searchCompany(newValue)
             companies.value = companiesSearch
         }
     })
 
     const onSubmit = () => {
-        console.log(state)
+        
     }
 </script>
 

@@ -88,17 +88,22 @@ export interface User {
     firstName: string
     lastName: string
     fullName: string
-    phone: string
-    avatar: string
+    phone?: string
+    avatar?: string
     connected: boolean
-    permissions: Permission[]
+    permissions?: Permission[]
 }
 
 export interface Permission {
+    id: string
     userId: string
     firmId: string
     clientId: string
     permission: PermissionType
+}
+
+export interface PermissionWithUser extends Permission {
+    user: User
 }
 
 export enum PermissionType {
